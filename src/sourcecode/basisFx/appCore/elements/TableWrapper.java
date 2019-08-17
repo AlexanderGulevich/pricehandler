@@ -93,6 +93,7 @@ public  class TableWrapper extends AppNode  {
         element =new TableView<>();
 
         cssClassesStrings=builder.cssClassesStrings;
+        cssClassesStringsList=builder.cssClassesStringsList;
         cssClasses=builder.cssClasses;
 
         element.getStyleClass().add(CSSclasses.TABLE_BFx.get());
@@ -353,6 +354,7 @@ public  class TableWrapper extends AppNode  {
         private String className;
         protected CSSclasses[] cssClasses;
         protected String[] cssClassesStrings;
+        protected List<String> cssClassesStringsList;
         private String cssClass;
 
         public Builder setCoordinate(Coordinate coordinate) {
@@ -372,6 +374,10 @@ public  class TableWrapper extends AppNode  {
 
         public Builder setCssClassesStrings(String... cssClassesStrings) {
             this.cssClassesStrings = cssClassesStrings;
+            return this;
+        }
+        public Builder setCssClassesStrings(List<String> cssClassesStringsList) {
+            this.cssClassesStringsList = cssClassesStringsList;
             return this;
         }
 

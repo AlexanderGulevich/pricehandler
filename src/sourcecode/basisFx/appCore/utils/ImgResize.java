@@ -13,7 +13,8 @@ public class ImgResize {
 
 
                 resize(in,out,480);
-
+//                resize(in,out,160);
+//
             }
 
             public static void   resize(String sourceFile, String ResizedFile, int width)

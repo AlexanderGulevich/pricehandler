@@ -1,10 +1,12 @@
-package basisFx.service;
+package basisFx.service.price;
 
 import basisFx.appCore.events.FileChooser;
 import basisFx.appCore.utils.OfficeExtensions;
 import basisFx.appCore.utils.Registry;
 import basisFx.domain.price.Price;
 import basisFx.domain.price.PriceReader;
+import basisFx.domain.price.PriceUtils;
+import basisFx.service.ServicePanels;
 import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -12,6 +14,7 @@ import javafx.scene.layout.AnchorPane;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,17 +66,22 @@ public class ServicePanelLoadPrice extends ServicePanels {
 
             Registry.dataExchanger.put("price",price);
 
+            textarea.setWrapText(true);
+            List<String>mess=new ArrayList<>();
+            HashMap<PriceUtils.Message,ArrayList<String>> priceMessage
+                    = (HashMap<PriceUtils.Message, ArrayList<String>>) Registry.dataExchanger.get("PriceMessage");
 
+            priceMessage.keySet().stream().forEach(message -> {
+                ArrayList<String> stringArrayList = priceMessage.get(message);
+                int length=stringArrayList.toArray().length;
+                if(length>0){
+                    Optional<String> reduce = stringArrayList.stream().distinct().reduce((s, s2) -> s + "\n" + s2);
+                    mess.add("\n\n"+message.get().toUpperCase()+"\n"+reduce.get());
 
-            ArrayList<String> priceMessage = (ArrayList<String>) Registry.dataExchanger.get("PriceMessage");
-            if ( priceMessage.toArray().length>0) {
-                textarea.setWrapText(true);
-                Optional<String> reduce = priceMessage.stream().distinct().reduce((s, s2) -> s + "\n\n" + s2);
-                textarea.setText(reduce.get());
-            }
+                }
+            });
 
-
-
+            textarea.setText(mess.stream().reduce((s, s2) -> s+s2).get());
 
 
         }

@@ -1,11 +1,12 @@
 package basisFx;
 
+import basisFx.appCore.DynamicContentPanel;
 import basisFx.appCore.menu.*;
+import basisFx.appCore.panelSets.Panel;
 import basisFx.appCore.settings.FontsStore;
 import basisFx.appCore.utils.Registry;
 import basisFx.presentation.*;
-import basisFx.service.ServicePanelPriceOutput;
-import basisFx.service.WindowServiceDatePicker;
+import javafx.scene.control.Label;
 
 import static basisFx.appCore.settings.FontsStore.*;
 
@@ -16,22 +17,44 @@ public class MainMenuSketch implements MenuSketch {
     private double iconSize = 25d;
 
     public MainMenuSketch() {
+        Label label = ((Label) Registry.mainWindow.getNodeFromMap("commonMenuLabel"));
+        label.setText("Управление прайсом");
+
+        new CommonPanel("\uF06C",FontsStore.FAWESOME5SOLID).initTemplateMethod(Registry.mainWindow);
 
         menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
+                .panelCreator(  () -> new DynamicContentPanel() {
+                    @Override
+                    protected void customDynamicElementsInit() {
+                        Panel.builder()
+                                .commonLabelName("Загрузка и проверка прайса")
+                                .fxmlFileName("priceLoader")
+                                .parent(dynamicContentAnchorHolder)
+                                .build().configure();
+                    }
+                })
                 .description("Загрузчик и проверка прайса \n")
                 .fontsStore(FAWESOME5SOLID)
                 .fxmlFileName("vbut.fxml")
-                .fontSymbol("\uF039")
+                .fontSymbol("\uF019")
                 .isActive(false)
                 .fontSize(iconSize)
-                .panelCreator( PriceLoader::new)
                 .build()
         );
 
         menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
+                .panelCreator(  () -> new DynamicContentPanel() {
+                    @Override
+                    protected void customDynamicElementsInit() {
+                        Panel.builder()
+                                .commonLabelName("Задание псевдонимов и категорий")
+                                .fxmlFileName("priceWritter")
+                                .parent(dynamicContentAnchorHolder)
+                                .build().configure();
+                    }
+                })
                         .description("Выгрузка прайса и настройка параметров, шаблоны \n")
                         .fontsStore(FAWESOME5SOLID)
-                        .panelCreator(PriceWritter::new)
                         .fxmlFileName("vbut.fxml")
                         .fontSymbol("\uF093")
                         .isActive(false)
@@ -40,23 +63,39 @@ public class MainMenuSketch implements MenuSketch {
         );
 
 
+//
+//        menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
+//                    .panelCreator(  () -> new DynamicContentPanel() {
+//                        @Override
+//                        protected void customDynamicElementsInit() {
+//                            Panel.builder()
+//                                    .commonLabelName("Загрузка картинки для штихкода")
+//                                    .fxmlFileName("imageHadler")
+//                                    .parent(dynamicContentAnchorHolder)
+//                                    .build().configure();
+//                        }
+//                    })
+//                    .description("Штрихкоды")
+//                    .fontsStore(FAWESOME5SOLID)
+//                    .fxmlFileName("vbut.fxml")
+//                    .fontSymbol("\uF02A")
+//                    .fontSize(iconSize)
+//                    .build()
+//        ) ;
+
 
         menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
-                    .panelCreator( () -> new CommonPanel("\uF02A",FontsStore.FAWESOME5SOLID))
-                    .callBack(WindowServiceDatePicker::closeIfExist)
-                    .description("Графики")
-                    .fontsStore(FAWESOME5SOLID)
-                    .fxmlFileName("vbut.fxml")
-                    .fontSymbol("\uF02A")
-                    .fontSize(iconSize)
-                    .build()
-        ) ;
-
-
-        menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
-                    .panelCreator( () -> new CommonPanel("\uF0CB",FontsStore.FAWESOME5SOLID))
-                    .callBack(WindowServiceDatePicker::closeIfExist)
-                    .description("Статистическая информация")
+                .panelCreator(  () -> new DynamicContentPanel() {
+                    @Override
+                    protected void customDynamicElementsInit() {
+                        Panel.builder()
+                                .commonLabelName("Таблица представления прайса")
+                                .fxmlFileName("priceTableViewer")
+                                .parent(dynamicContentAnchorHolder)
+                                .build().configure();
+                    }
+                })
+                    .description("Управление категориями")
                     .fontsStore(FAWESOME5SOLID)
                     .fxmlFileName("vbut.fxml")
                     .fontSymbol("\uF0CB")
@@ -64,25 +103,25 @@ public class MainMenuSketch implements MenuSketch {
                     .build()
         ) ;
         menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
-                .panelCreator( () -> new CommonPanel("\uF085",FontsStore.FAWESOME5SOLID))
-                .callBack(WindowServiceDatePicker::closeIfExist)
-                .description("Статистическая информация")
-                .fontsStore(FAWESOME5SOLID)
-                .fxmlFileName("vbut.fxml")
-                .fontSymbol("\uF085")
-                .fontSize(iconSize)
-                .build()
+                .panelCreator(  () -> new DynamicContentPanel() {
+                    @Override
+                    protected void customDynamicElementsInit() {
+                        Panel.builder()
+                                .commonLabelName("Конфигурация")
+                                .fxmlFileName("settings")
+                                .parent(dynamicContentAnchorHolder)
+                                .build().configure();
+                    }
+                })
+                    .description("Управление категориями и задание псевдонимов")
+                    .fontsStore(FAWESOME5SOLID)
+                    .fxmlFileName("vbut.fxml")
+                    .fontSymbol("\uF085")
+                    .fontSize(iconSize)
+                    .build()
         ) ;
-        menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
-                .panelCreator( () -> new CommonPanel("\uF085",FontsStore.FAWESOME5SOLID))
-                .callBack(WindowServiceDatePicker::closeIfExist)
-                .description("Статистическая информация")
-                .fontsStore(FAWESOME5SOLID)
-                .fxmlFileName("vbut.fxml")
-                .fontSymbol("\uF085")
-                .fontSize(iconSize)
-                .build()
-        ) ;
+
+
 
 
 

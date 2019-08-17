@@ -2,6 +2,7 @@ package basisFx.appCore.table;
 
 import basisFx.appCore.activeRecord.ActiveRecord;
 import basisFx.appCore.interfaces.CallBackTypedAndParametrized;
+import basisFx.appCore.interfaces.DataStoreCallBack;
 import basisFx.appCore.windows.WindowBuilder;
 import basisFx.domain.Label;
 
@@ -51,6 +52,15 @@ public interface ColumnFabric {
        return   ColWrapperPopupViaBtn.newBuilder()
                .setBtnName(butName)
                .setColumnName(name)
+               .setColumnSize(size)
+               .setWindowBuilder(windowBuilder)
+               .build();
+    }
+    static  ColWrapper popupViaBtnCol(String name, String butName, double size, WindowBuilder windowBuilder, DataStoreCallBack callBack){
+       return   ColWrapperPopupViaBtn.newBuilder()
+               .setBtnName(butName)
+               .setColumnName(name)
+               .setDataStoreCallBack(callBack)
                .setColumnSize(size)
                .setWindowBuilder(windowBuilder)
                .build();

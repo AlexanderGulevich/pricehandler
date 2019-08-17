@@ -10,6 +10,8 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class CommentUtils {
 
@@ -36,7 +38,10 @@ public class CommentUtils {
             int height = bim.getHeight();
             int width = bim.getWidth();
 
-            int rows=height/20;
+            int rows=height/20/3;
+
+//            int intValue = BigDecimal.valueOf(height).divide(BigDecimal.valueOf(20)).setScale(0, RoundingMode.CEILING).toBigInteger().intValue();
+            int intValue = BigDecimal.valueOf(height).divide(BigDecimal.valueOf(60)).setScale(0, RoundingMode.CEILING).toBigInteger().intValue();
 
             HSSFCreationHelper creationHelper = wb.getCreationHelper();
             HSSFPatriarch drawingPatriarch = spreadsheet.createDrawingPatriarch();
@@ -54,9 +59,11 @@ public class CommentUtils {
 //            anchor.setDy1(50);
 //            anchor.setDy2(50);
             anchor.setCol1(c+1);
-            anchor.setCol2(c + 3);
+//            anchor.setCol2(c + 3);
+            anchor.setCol2(c + 2);
             anchor.setRow1(r);
-            anchor.setRow2(r + rows);
+//            anchor.setRow2(r + rows);
+            anchor.setRow2(r + intValue);
 
             float heightInPoints = anchor.getAnchorHeightInPoints(spreadsheet);
             int columnWidth = spreadsheet.getColumnWidth(cell.getColumnIndex());

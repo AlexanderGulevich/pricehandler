@@ -1,4 +1,4 @@
-package basisFx.presentation;
+package basisFx.presentation.price;
 
 import basisFx.appCore.DynamicContentPanel;
 import basisFx.appCore.activeRecord.ActiveRecord;

@@ -22,9 +22,8 @@ public class Panel implements PanelSets {
 
         AnchorPane anchorPaneFromFXML = FXMLLoader.loadAnchorPane(fxmlFileName);
         ServicePanels service = (ServicePanels) Registry.dataExchanger.get(fxmlFileName);
-        service.commonLabelName(commonLabelName);
+        if(commonLabelName!=null) service.commonLabelName(commonLabelName);
         service.init();
-
         Coordinate coordinate=new Coordinate(0d,0d,0d,0d);
         coordinate.setChildNode(anchorPaneFromFXML);
         coordinate.setParentAnchorPane(parent);

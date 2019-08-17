@@ -1,8 +1,9 @@
-package basisFx.service;
+package basisFx.service.price;
 
 import basisFx.appCore.events.CloseMainWindow;
 import basisFx.appCore.events.StageDragging;
 import basisFx.appCore.utils.Registry;
+import basisFx.service.WindowService;
 import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

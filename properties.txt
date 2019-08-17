@@ -1,0 +1,5 @@
+#Properties
+#Sat Aug 17 19:49:26 AST 2019
+db_name=price_db_OMTS
+db_path=C\:\\
+db_folder=OMTS
