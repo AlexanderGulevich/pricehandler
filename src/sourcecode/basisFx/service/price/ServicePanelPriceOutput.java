@@ -1,24 +1,42 @@
 package basisFx.service.price;
 
+import basisFx.appCore.DynamicContentPanel;
+import basisFx.appCore.activeRecord.ActiveRecord;
+import basisFx.appCore.elements.CheckBoxAdapter;
+import basisFx.appCore.elements.ComboboxAdapter;
+import basisFx.appCore.elements.ToogleHandler;
 import basisFx.appCore.events.DirectoryChosserEvent;
+import basisFx.appCore.events.SubWindowCreaterByBut;
 import basisFx.appCore.grid.ButSizeEnum;
 import basisFx.appCore.grid.CtrlPosEnum;
 import basisFx.appCore.panelSets.SingleTableSet;
+import basisFx.appCore.poi.StringHandler;
 import basisFx.appCore.table.ColumnFabric;
-import basisFx.appCore.utils.Coordinate;
+import basisFx.appCore.utils.FXMLLoader;
 import basisFx.appCore.utils.Registry;
-import basisFx.domain.SleevePrice;
+import basisFx.appCore.windows.WindowAbstraction;
+import basisFx.appCore.windows.WindowBuilder;
+import basisFx.domain.price.OutputTemplate;
 import basisFx.domain.price.Price;
+import basisFx.domain.price.StoredCategory;
 import basisFx.domain.price.WritePrice;
 import basisFx.service.ServicePanels;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
+import com.jfoenix.controls.JFXToggleButton;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 public class ServicePanelPriceOutput extends ServicePanels {
@@ -27,13 +45,17 @@ public class ServicePanelPriceOutput extends ServicePanels {
     @FXML
     private JFXButton saveTamplate;
     @FXML
+    private Button templateTableBut;
+    @FXML
+    private Button categoryTableBut;
+    @FXML
     private Label commonLabelName;
     @FXML
-    private TextField textfield;
+    private TextField textField;
     @FXML
     private FlowPane flowpane;
     @FXML
-    private JFXCheckBox checkAll;
+    private JFXCheckBox selecyAll;
     @FXML
     private JFXCheckBox addImage;
     @FXML
@@ -42,17 +64,25 @@ public class ServicePanelPriceOutput extends ServicePanels {
     private ComboBox tamplateCombobox;
     @FXML
     private AnchorPane panelAnchor;
-//    @FXML
-//    private AnchorPane tableAnchor_left;
-//    @FXML
-//    private AnchorPane tableAnchor_right;
+    @FXML
+    private JFXToggleButton swichImgSize;
 
     DirectoryChosserEvent directoryChosserEvent;
+
+    ToogleHandler toogleHandler_swichImgSize;
+
+    StringHandler stringHandler=new StringHandler();
+
+    ComboboxAdapter comboboxAdapter;
+
+    ArrayList<StoredCategory> storedCategoryArrayList=new ArrayList<>();
+    ArrayList<CheckBoxAdapter> checkBoxHandlersArrayList =new ArrayList<>();
 
     @Override
     public void init() {
 
-
+        toogleHandler_swichImgSize=new ToogleHandler(swichImgSize,this);
+        comboboxAdapter = new ComboboxAdapter(tamplateCombobox, this, OutputTemplate.getINSTANCE());
         currentWindow=Registry.mainWindow;
 
         directoryChosserEvent = new DirectoryChosserEvent();
@@ -69,60 +99,178 @@ public class ServicePanelPriceOutput extends ServicePanels {
 
         );
 
+        addImage.setSelected(true);
 
-//
-//        SingleTableSet.builder()
-//                .aClass(SleevePrice.class)
-//                .isSortable(false) .isEditable(true)
-//                .currentWindow(currentWindow)
-//                .bigTitle(null)
-//                .littleTitle("Цена втулок")
-//                .parentAnchor(tableAnchor_left)
-//                .coordinate(new Coordinate(0d, 0d, 0d, 0d))
-//                .ctrlPosEnum(CtrlPosEnum.CTRL_POS_TOP)
-//                .butSizeEnum(ButSizeEnum.BUT_SIZE_LITTLE)
-//                .addButEvent(null)
-//                .delButEvent(null)
-//                .column(
-//                        ColumnFabric.doubleCol(
-//                                "Цена","price",1d,true
-//                        )
-//                )
-//
-//                .build().configure();
-//
-//
-//        SingleTableSet.builder()
-//                .aClass(SleevePrice.class)
-//                .isSortable(false) .isEditable(true)
-//                .currentWindow(currentWindow)
-//                .bigTitle(null)
-//                .littleTitle("Цена втулок")
-//                .parentAnchor(tableAnchor_right )
-//                .coordinate(new Coordinate(0d, 0d, 0d, 0d))
-//                .ctrlPosEnum(CtrlPosEnum.CTRL_POS_TOP)
-//                .butSizeEnum(ButSizeEnum.BUT_SIZE_LITTLE)
-//                .addButEvent(null)
-//                .delButEvent(null)
-//                .column(
-//                        ColumnFabric.doubleCol(
-//                                "Цена","price",1d,true
-//                        )
-//                )
-//
-//                .build().configure();
-
-
-
-
-
-
-
-
-
+        selecyAllAction();
+        switchImgInit();
+        checkboxCreater();
+        createStoredCategoryPopup();
+        createOutputTemplatePopup();
+        saveTemplateAction();
+        standatrCategorySwitch();
 
     }
 
+    private void standatrCategorySwitch() {
+        standatrCategory.setOnAction(event -> {
+            if (standatrCategory.isSelected()) {
+                noneSelectionForAllAction();
+                standatrCategory.setSelected(true);
+                selecyAll.setSelected(false);
+            }else {
+                standatrCategory.setSelected(false);
+            }
+
+        });
+    }
+
+    private void saveTemplateAction() {
+        saveTamplate.setOnAction(event ->
+                {
+                    String textStart = textField.getText().trim();
+                    String text=stringHandler.delAllSpace(textStart);
+                    int length = text.length();
+                    if(length ==0) Registry.windowFabric.infoWindow("Введите имя шаблона.");
+                    if(length >0 && length <5) Registry.windowFabric.infoWindow("Введите, как минимум, 5 символов.");
+                    if(length >4) {
+                        OutputTemplate outputTemplate=new OutputTemplate();
+                        outputTemplate.setName(textStart);
+                        List<Integer> collect = storedCategoryArrayList.stream().mapToInt(value -> value.getId()).boxed().collect(Collectors.toList());
+                        outputTemplate.setStoredCategory(new ArrayList<>(collect));
+                        outputTemplate.insert();
+                        textField.clear();
+                    }
+                    comboboxAdapter.refresh();
+                }
+                );
+    }
+
+    private void selecyAllAction() {
+        selecyAll.setOnAction(event -> {
+            if (selecyAll.isSelected()) {
+                storedCategoryArrayList.clear();
+                checkBoxHandlersArrayList.forEach(cbh ->{
+                    JFXCheckBox jfxCheckBox = cbh.getJfxCheckBox();
+                    StoredCategory storedCategory = (StoredCategory) cbh.getRecord();
+                    storedCategoryArrayList.add(storedCategory);
+                    jfxCheckBox.setSelected(true);
+                    standatrCategory.setSelected(false);
+                } );
+            }else {
+                checkBoxHandlersArrayList.forEach(cbh ->{
+                    JFXCheckBox jfxCheckBox = cbh.getJfxCheckBox();
+                    storedCategoryArrayList.clear();
+                    jfxCheckBox.setSelected(false);
+                } );
+            }
+        });
+    }
+
+    private void noneSelectionForAllAction() {
+                storedCategoryArrayList.clear();
+                checkBoxHandlersArrayList.forEach(cbh ->{
+                    JFXCheckBox jfxCheckBox = cbh.getJfxCheckBox();
+                    jfxCheckBox.setSelected(false);
+                } );
+    }
+
+    private void switchImgInit() {
+        swichImgSize.setText("Большие картинки");
+        swichImgSize.setSelected(true);
+        swichImgSize.setOnAction(event -> {
+        });
+    }
+
+    private void checkboxCreater() {
+        flowpane.getChildren().clear();
+        checkBoxHandlersArrayList.clear();
+        ObservableList<ActiveRecord> activeRecords = StoredCategory.getINSTANCE().getAll();
+        activeRecords.stream().forEach(record -> {
+            JFXCheckBox checkbox = FXMLLoader.loadCheckBox("checkbox");
+            checkbox.setText(((StoredCategory) record).getName());
+            CheckBoxAdapter checkBoxAdapter = new CheckBoxAdapter(checkbox, this, record);
+            checkBoxHandlersArrayList.add(checkBoxAdapter);
+            flowpane.getChildren().add(checkbox);
+        });
+    }
+
+    private void createStoredCategoryPopup() {
+        WindowBuilder popup = WindowBuilder.newBuilder()
+                .setPanelCreator(() -> new DynamicContentPanel() {
+                    @Override
+                    protected void customDynamicElementsInit() {
+                        SingleTableSet.builder()
+                                .aClass(StoredCategory.class)
+                                .isSortable(false).isEditable(true).bigTitle(null)
+                                .currentWindow(window)
+                                .littleTitle("Управление категориями прайса")
+                                .parentAnchor(dynamicContentAnchorHolder)
+                                .ctrlPosEnum(CtrlPosEnum.CTRL_POS_TOP)
+                                .butSizeEnum(ButSizeEnum.BUT_SIZE_BIG)
+                                .addButEvent(null).delButEvent(null)
+                                .column( ColumnFabric.intCol( "№","rank",0.1d,true ) )
+                                .column( ColumnFabric.stringCol( "Наименование ","name",0.9d,true ) )
+                                .build().configure();
+                    }
+                })
+                .setTitle("Категории")
+                .setMessage(null)
+                .setFxmlFileName("AddDellPopupWindow")
+                .setParentAnchorNameForFXML(WindowAbstraction.DefaultPanelsNames.topVisibleAnchor.name())
+                .setWidth(700d).setHeight(600d)
+                .setPreClosingCallBack(()->{
+                    checkboxCreater();
+                    storedCategoryArrayList.forEach(storedCategory ->
+                            checkBoxHandlersArrayList.forEach(checkBoxAdapter -> {
+                                if (((StoredCategory) checkBoxAdapter.getRecord()).getName().equals(storedCategory.getName())) {
+                                    checkBoxAdapter.getJfxCheckBox().setSelected(true);
+                                }
+                            }));
+                })
+                .build();
+
+        SubWindowCreaterByBut subWindowCreaterByBut=new SubWindowCreaterByBut();
+        subWindowCreaterByBut.setEventToElement(categoryTableBut);
+        subWindowCreaterByBut.setWindowBuilder(popup);
+    }
+
+    private void createOutputTemplatePopup() {
+        WindowBuilder popup = WindowBuilder.newBuilder()
+                .setPanelCreator(() -> new DynamicContentPanel() {
+                    @Override
+                    protected void customDynamicElementsInit() {
+//        ScenicView.show(window.getScene());
+                        SingleTableSet.builder()
+                                .aClass(OutputTemplate.class)
+                                .isSortable(false).isEditable(true).bigTitle(null)
+                                .currentWindow(window)
+                                .littleTitle("Управление шаблонами вывода")
+                                .parentAnchor(dynamicContentAnchorHolder)
+                                .ctrlPosEnum(CtrlPosEnum.CTRL_POS_DEL_BUT_BOTTON)
+                                .butSizeEnum(ButSizeEnum.BUT_SIZE_BIG)
+                                .addButEvent(null).delButEvent(null)
+                                .column( ColumnFabric.stringCol( "Наименование ","name",1d,true ) )
+                                .build().configure();
+                    }
+                })
+                .setTitle("Шаблон")
+                .setMessage(null)
+                .setFxmlFileName("AddDellPopupWindow")
+                .setParentAnchorNameForFXML(WindowAbstraction.DefaultPanelsNames.topVisibleAnchor.name())
+                .setWidth(700d).setHeight(600d)
+                .setPreClosingCallBack( () -> {
+                    comboboxAdapter.refresh();
+                            })
+                .setCallBackParametrized( clickedDomain ->{
+                    OutputTemplate record = (OutputTemplate) clickedDomain;
+                    comboboxAdapter.choiceItem(record);
+                } )
+                .build();
+
+        SubWindowCreaterByBut subWindowCreaterByBut=new SubWindowCreaterByBut();
+        subWindowCreaterByBut.setEventToElement(templateTableBut);
+        subWindowCreaterByBut.setWindowBuilder(popup);
+    }
 
 
     @Override
@@ -146,8 +294,55 @@ public class ServicePanelPriceOutput extends ServicePanels {
 
 
         }
+        if (node==tamplateCombobox) {
+            noneSelectionForAllAction();
+            OutputTemplate outputTemplate = ((OutputTemplate) comboboxAdapter.getSelected());
+            ArrayList<Integer> storedCategoryIdList = outputTemplate.getStoredCategory();
+            for (Integer id : storedCategoryIdList) {
+                CheckBoxAdapter checkBoxAdapter = getCheckBoxHandlerById(id);
+                checkBoxAdapter.getJfxCheckBox().setSelected(true);
+                jfxCheckBoxSwitchBehaviour(checkBoxAdapter.getJfxCheckBox(),(StoredCategory) checkBoxAdapter.getRecord());
+            }
 
 
+
+        }
+        if ( node.getClass()== CheckBoxAdapter.class) {
+            CheckBoxAdapter checkBoxAdapter = (CheckBoxAdapter) node;
+            JFXCheckBox jfxCheckBox = checkBoxAdapter.getJfxCheckBox();
+            StoredCategory record = (StoredCategory) checkBoxAdapter.getRecord();
+            jfxCheckBoxSwitchBehaviour(jfxCheckBox, record);
+        }
+
+
+    }
+
+    private CheckBoxAdapter getCheckBoxHandlerById(Integer id) {
+        Optional<CheckBoxAdapter> first = checkBoxHandlersArrayList.stream().filter(c ->
+
+        {
+            Integer id_from_checkBoxHandlersArrayList = c.getRecord().getId();
+            return id_from_checkBoxHandlersArrayList.equals(id);
+        })
+                .findAny();
+        CheckBoxAdapter checkBoxAdapter = first.get();
+        return checkBoxAdapter;
+    }
+
+    private void jfxCheckBoxSwitchBehaviour(JFXCheckBox jfxCheckBox, StoredCategory record) {
+        standatrCategory.setSelected(false);
+        if (jfxCheckBox.isSelected()) {
+            storedCategoryArrayList.add(record);
+        }else {
+            List<StoredCategory> collect = storedCategoryArrayList.stream()
+                    .filter(storedCategory -> storedCategory.getName().equals(record.getName())).collect(Collectors.toList());
+            if(collect.toArray().length>1){
+                Registry.windowFabric.infoWindow("в storedCategoryArrayList > 2 одинаковых значений");
+            }
+            else {
+            storedCategoryArrayList.remove(collect.get(0));
+            }
+        }
     }
 
 }

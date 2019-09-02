@@ -18,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
+import lombok.Setter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,7 +71,7 @@ public class ServicePanelImageHandler extends ServicePanels {
 
 
     public ServicePanelImageHandler() {
-        Registry.dataExchanger.put("imageHadler", this);
+        Registry.dataExchanger.put("priceImageHadler", this);
     }
 
 

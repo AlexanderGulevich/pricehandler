@@ -18,7 +18,7 @@ public class MainMenuSketch implements MenuSketch {
 
     public MainMenuSketch() {
         Label label = ((Label) Registry.mainWindow.getNodeFromMap("commonMenuLabel"));
-        label.setText("Управление прайсом");
+        label.setText("ПРАЙС-ЛИСТ");
 
         new CommonPanel("\uF06C",FontsStore.FAWESOME5SOLID).initTemplateMethod(Registry.mainWindow);
 
@@ -27,39 +27,19 @@ public class MainMenuSketch implements MenuSketch {
                     @Override
                     protected void customDynamicElementsInit() {
                         Panel.builder()
-                                .commonLabelName("Загрузка и проверка прайса")
+                                .commonLabelName("Прайс-лист")
                                 .fxmlFileName("priceLoader")
                                 .parent(dynamicContentAnchorHolder)
                                 .build().configure();
                     }
                 })
-                .description("Загрузчик и проверка прайса \n")
+                .description("Загрузка и проверка прайса \n")
                 .fontsStore(FAWESOME5SOLID)
                 .fxmlFileName("vbut.fxml")
                 .fontSymbol("\uF019")
                 .isActive(false)
                 .fontSize(iconSize)
                 .build()
-        );
-
-        menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
-                .panelCreator(  () -> new DynamicContentPanel() {
-                    @Override
-                    protected void customDynamicElementsInit() {
-                        Panel.builder()
-                                .commonLabelName("Задание псевдонимов и категорий")
-                                .fxmlFileName("priceWritter")
-                                .parent(dynamicContentAnchorHolder)
-                                .build().configure();
-                    }
-                })
-                        .description("Выгрузка прайса и настройка параметров, шаблоны \n")
-                        .fontsStore(FAWESOME5SOLID)
-                        .fxmlFileName("vbut.fxml")
-                        .fontSymbol("\uF093")
-                        .isActive(false)
-                        .fontSize(iconSize)
-                        .build()
         );
 
 
@@ -102,6 +82,32 @@ public class MainMenuSketch implements MenuSketch {
                     .fontSize(iconSize)
                     .build()
         ) ;
+
+
+
+        menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
+                .panelCreator(  () -> new DynamicContentPanel() {
+                    @Override
+                    protected void customDynamicElementsInit() {
+                        Panel.builder()
+                                .commonLabelName("Задание псевдонимов и категорий")
+                                .fxmlFileName("priceWritter")
+                                .parent(dynamicContentAnchorHolder)
+                                .build().configure();
+                    }
+                })
+                .description("Выгрузка прайса и настройка параметров, шаблоны \n")
+                .fontsStore(FAWESOME5SOLID)
+                .fxmlFileName("vbut.fxml")
+                .fontSymbol("\uF093")
+                .isActive(false)
+                .fontSize(iconSize)
+                .build()
+        );
+
+
+
+
         menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
                 .panelCreator(  () -> new DynamicContentPanel() {
                     @Override

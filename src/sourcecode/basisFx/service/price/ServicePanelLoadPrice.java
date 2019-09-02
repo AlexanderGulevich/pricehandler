@@ -1,6 +1,8 @@
 package basisFx.service.price;
 
 import basisFx.appCore.events.FileChooser;
+import basisFx.appCore.settings.FontsStore;
+import basisFx.appCore.utils.FontLogic;
 import basisFx.appCore.utils.OfficeExtensions;
 import basisFx.appCore.utils.Registry;
 import basisFx.domain.price.Price;
@@ -13,6 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,33 +63,38 @@ public class ServicePanelLoadPrice extends ServicePanels {
     public void inform(Object node) {
         if (node==load) {
             textarea.clear();
+            textfield.setText(fileChooser.getFiles().get(0).getAbsolutePath());
             List<File> files = fileChooser.getFiles();
             PriceReader priceReader = new PriceReader(files.get(0));
             Price price = priceReader.getPrice();
-
             Registry.dataExchanger.put("price",price);
-
             textarea.setWrapText(true);
-            List<String>mess=new ArrayList<>();
-            HashMap<PriceUtils.Message,ArrayList<String>> priceMessage
-                    = (HashMap<PriceUtils.Message, ArrayList<String>>) Registry.dataExchanger.get("PriceMessage");
-
-            priceMessage.keySet().stream().forEach(message -> {
-                ArrayList<String> stringArrayList = priceMessage.get(message);
-                int length=stringArrayList.toArray().length;
-                if(length>0){
-                    Optional<String> reduce = stringArrayList.stream().distinct().reduce((s, s2) -> s + "\n" + s2);
-                    mess.add("\n\n"+message.get().toUpperCase()+"\n"+reduce.get());
-
-                }
-            });
-
-            textarea.setText(mess.stream().reduce((s, s2) -> s+s2).get());
-
-
+            setMessage(price);
         }
 
 
+    }
+
+    private void setMessage(Price price) {
+        List<String> mess=new ArrayList<>();
+        HashMap<PriceUtils.Message,ArrayList<String>> priceMessage
+                = (HashMap<PriceUtils.Message, ArrayList<String>>) Registry.dataExchanger.get("PriceMessage");
+
+        priceMessage.keySet().stream().forEach(message -> {
+            ArrayList<String> stringArrayList = priceMessage.get(message);
+            int length=stringArrayList.toArray().length;
+            if(length>0){
+                Optional<String> reduce = stringArrayList.stream().distinct().reduce((s, s2) -> s + "\n" + s2);
+                mess.add("\n\n"+message.get().toUpperCase()+"\n"+reduce.get());
+
+            }
+        });
+        DecimalFormat df = new DecimalFormat("###,###.##");
+        textarea.setText(
+                "СУММА ПО ТЕКУЩИМ СОСТАТКАМ СОСТАВЛЯЕТ : "+df.format(price.getTotalSumma())+" руб."+
+                mess.stream().reduce((s, s2) -> s+s2).get()
+
+        );
     }
 
 }

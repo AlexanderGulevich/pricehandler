@@ -3,6 +3,7 @@ package basisFx.domain.price;
 import java.io.IOException;
 import java.util.Iterator;
 
+import basisFx.appCore.activeRecord.BoolComboBox;
 import basisFx.appCore.poi.Reader;
 import basisFx.appCore.utils.Registry;
 import lombok.Getter;
@@ -82,7 +83,7 @@ public class PriceReader extends Reader {
                         if (priceUtils.isEnd(row.getCell(0))) {
                             Double summa = priceUtils.readTotalSumma(row.getCell(13));
                             price.setTotalSumma(summa);
-                            priceUtils.getMessageMap().get(PriceUtils.Message.SUM).add("---"+summa.toString() + "  руб.");
+//                            priceUtils.getMessageMap().get(PriceUtils.Message.SUM).add("---"+summa.toString() + "  руб.");
                             break;
                        }
        }
@@ -101,19 +102,25 @@ public class PriceReader extends Reader {
              row = rowIterator.next();
 
                      if (priceUtils.isFild(row.getCell(2))) {
-                         
+
+                         String barcode = priceUtils.readBarcode(row.getCell(2));
+
                          PriceItem product=new PriceItem();
+
                          product.setOrderNumber(priceUtils.readOrderString(row.getCell(2)));
                          product.setPure_order(priceUtils.readPureOrder(row.getCell(2)));
-                         product.setName(priceUtils.readProdactName(row.getCell(2)));
-                         product.setBarcode(priceUtils.readBarcode(row.getCell(2)));
+                         product.setName(priceUtils.readProdactName(row.getCell(2),barcode));
+                         product.setBarcode(barcode);
                          product.setAmountInBox(priceUtils.readAmountInbox(row.getCell(2)));
                          product.setAmountInPrice(priceUtils.readAmount(row.getCell(8)));
                          product.setMeasure(priceUtils.readMeasure(row.getCell(6)));
                          product.setPricePerUnit(priceUtils.readPricePerUnit(row.getCell(10)));
+
                          product.setImg( Img.getINSTANCE().find(product) );
                          product.setStoredCategory(product.findStoredCategory() );
                          product.setAlias(product.findAlias() );
+                         product.setVisibitity(new BoolComboBox(product.findVisibility()));
+
                          products.add(product);
                     }
              }

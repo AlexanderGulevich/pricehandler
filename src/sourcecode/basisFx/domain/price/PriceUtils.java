@@ -16,11 +16,12 @@ public class PriceUtils {
     public enum Message {
         NOT_READ("Не получилось прочитать заказ: "),
         BRACKET("Скобка на закрыта: "),
-        SUM("СУММА ПО ТЕКУЩИМ СОСТАТКАМ СОСТАВЛЯЕТ : "),
+//        SUM("СУММА ПО ТЕКУЩИМ СОСТАТКАМ СОСТАВЛЯЕТ : "),
+        BARCODE_NON("Отсутствует штрихкод : "),
         BARCODE_13("Шрихкод нижеследующего товара содержит  менее 13 символов: ");
         private final String mess;
-        private Message(String id) {
-            this.mess = id;
+        private Message(String mess) {
+            this.mess = mess;
         }
         public String get() {
             return mess;
@@ -35,7 +36,8 @@ public class PriceUtils {
         messageMap.put(Message.NOT_READ,new ArrayList<>());
         messageMap.put(Message.BARCODE_13,new ArrayList<>());
         messageMap.put(Message.BRACKET,new ArrayList<>());
-        messageMap.put(Message.SUM,new ArrayList<>());
+//        messageMap.put(Message.SUM,new ArrayList<>());
+        messageMap.put(Message.BARCODE_NON,new ArrayList<>());
     }
     public Boolean isCategory(Cell c ) {
      String value=null;
@@ -103,9 +105,8 @@ public class PriceUtils {
                                   }else{ return "не найдено";}
      }
 
-     public String readProdactName(Cell c){
+     public String readProdactName(Cell c,String barcode){
          String value= c.getStringCellValue();
-         String barcode = readBarcode(c);
          if (barcode != null) value=strHandler.delText(value,barcode);
          try {
              value=value.substring( value.indexOf("-")+1);
@@ -317,6 +318,7 @@ public class PriceUtils {
                 continue;
              }
          }
+         messageMap.get(Message.BARCODE_NON).add("---"+c.getStringCellValue());
          return null;
      }
      

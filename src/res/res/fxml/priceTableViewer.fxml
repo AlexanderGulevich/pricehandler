@@ -24,7 +24,7 @@
                         <Insets />
                      </opaqueInsets>
                      <children>
-                        <JFXToggleButton fx:id="imgToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="Отобр. без картинок" toggleColor="#6878858c" toggleLineColor="#dddde4">
+                        <JFXToggleButton fx:id="imgToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="Без картинок" toggleColor="#6878858c" toggleLineColor="#dddde4">
                            <font>
                               <Font name="Roboto Light" size="15.0" />
                            </font>
@@ -36,7 +36,7 @@
                         <Insets />
                      </opaqueInsets>
                      <children>
-                        <JFXToggleButton fx:id="categoryToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="Отобр. без категорий" toggleColor="#6878858c" toggleLineColor="#dddde4">
+                        <JFXToggleButton fx:id="categoryToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="Без категорий" toggleColor="#6878858c" toggleLineColor="#dddde4">
                            <font>
                               <Font name="Roboto Light" size="15.0" />
                            </font>
@@ -48,7 +48,7 @@
                         <Insets />
                      </opaqueInsets>
                      <children>
-                        <JFXToggleButton fx:id="aliasToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="Отобр. без  псевдонимов" toggleColor="#6878858c" toggleLineColor="#dddde4">
+                        <JFXToggleButton fx:id="aliasToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="Без  псевдонимов" toggleColor="#6878858c" toggleLineColor="#dddde4">
                            <font>
                               <Font name="Roboto Light" size="15.0" />
                            </font>
@@ -60,7 +60,7 @@
                         <Insets />
                      </opaqueInsets>
                      <children>
-                        <JFXToggleButton fx:id="viewedToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="Отобр. невыводимые в прайс" toggleColor="#6878858c" toggleLineColor="#dddde4">
+                        <JFXToggleButton fx:id="viewedToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="Невыводимые " toggleColor="#6878858c" toggleLineColor="#dddde4">
                            <font>
                               <Font name="Roboto Light" size="15.0" />
                            </font>
@@ -72,7 +72,19 @@
                         <Insets />
                      </opaqueInsets>
                      <children>
-                        <JFXToggleButton fx:id="allToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="Отобр. все" toggleColor="#6878858c" toggleLineColor="#dddde4">
+                        <JFXToggleButton fx:id="noneBarcodeToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="Без штрихкода" toggleColor="#6878858c" toggleLineColor="#dddde4">
+                           <font>
+                              <Font name="Roboto Light" size="15.0" />
+                           </font>
+                        </JFXToggleButton>
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <children>
+                        <JFXToggleButton fx:id="allToggle" styleClass="font_mediumGrey" stylesheets="@../css/custom_1/fonts.css" text="ВСЕ" toggleColor="#6878858c" toggleLineColor="#dddde4">
                            <font>
                               <Font name="Roboto Light" size="15.0" />
                            </font>

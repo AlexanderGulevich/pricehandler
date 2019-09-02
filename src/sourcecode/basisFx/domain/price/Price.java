@@ -23,9 +23,16 @@ public class Price  {
     private Double totalSumma=null;
     @Getter @Setter
     private String priceDateString=null;
+    @Getter @Setter
+    private boolean filledItems=false;
 
+    public  static   ObservableList<ActiveRecord>  allFromDB;
 
-    public void createCategory(String name,  ArrayList<PriceItem> categoryFilds){
+    public Price() {
+        this.allFromDB = null;
+    }
+
+    public void createCategory(String name, ArrayList<PriceItem> categoryFilds){
 
         PriceCategory category=new PriceCategory();
         category.setFilds(categoryFilds);

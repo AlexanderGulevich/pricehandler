@@ -56,14 +56,27 @@ public interface ColumnFabric {
                .setWindowBuilder(windowBuilder)
                .build();
     }
-    static  ColWrapper popupViaBtnCol(String name, String butName, double size, WindowBuilder windowBuilder, DataStoreCallBack callBack){
-       return   ColWrapperPopupViaBtn.newBuilder()
-               .setBtnName(butName)
-               .setColumnName(name)
-               .setDataStoreCallBack(callBack)
-               .setColumnSize(size)
-               .setWindowBuilder(windowBuilder)
-               .build();
+    static  ColWrapperPopupViaBtnButYN.Builder popupViaBtnColButYNBuilder(String name, String butNameY, String butNameN, double size, WindowBuilder windowBuilder, DataStoreCallBack callBack){
+        ColWrapperPopupViaBtnButYN.Builder builder = ColWrapperPopupViaBtnButYN.newBuilder()
+                .setBtnNameY(butNameY)
+                .setBtnNameN(butNameN)
+                .setColumnName(name)
+                .setDataStoreCallBack(callBack)
+                .setColumnSize(size)
+                .setWindowBuilder(windowBuilder);
+
+        return builder;
+    }
+    static   ColWrapper popupViaBtnColButYN(String name, String butNameY, String butNameN, double size, WindowBuilder windowBuilder, DataStoreCallBack callBack){
+        return ColWrapperPopupViaBtnButYN.newBuilder()
+                .setBtnNameY(butNameY)
+                .setBtnNameN(butNameN)
+                .setColumnName(name)
+                .setDataStoreCallBack(callBack)
+                .setColumnSize(size)
+                .setWindowBuilder(windowBuilder)
+                .build();
+
     }
     static  ColWrapper popup(String name,String property, double size, WindowBuilder windowBuilder){
        return   ColWrapperPopup.newBuilder()

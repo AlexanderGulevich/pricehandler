@@ -58,7 +58,7 @@ public class App{
 
 //        ScenicView.show(Registry.mainWindow.getScene());
 
-        ImgResize.mainr();
+
 
     }
 

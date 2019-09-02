@@ -12,6 +12,8 @@ import basisFx.appCore.interfaces.DataStoreCallBack;
 import basisFx.appCore.settings.CSSclasses;
 import basisFx.appCore.settings.FontsStore;
 import basisFx.appCore.table.ColWrapper;
+import basisFx.appCore.table.ColWrapperPopupViaBtnButYN;
+import basisFx.appCore.table.ColumnFabric;
 import basisFx.appCore.utils.Coordinate;
 import basisFx.appCore.utils.Range;
 import basisFx.appCore.utils.Registry;
@@ -47,6 +49,7 @@ public class SingleTableSet implements PanelSets {
     private boolean isSortable;
     private String cssClass;
     @Singular("column")  private List<ColWrapper> column;
+    @Singular("colWrapperPopupViaBtnButYN")  private List<ColWrapperPopupViaBtnButYN.Builder> colWrapperPopupViaBtnButYN;
     private String bigTitle;
     private String littleTitle;
     private Class aClass;
@@ -121,6 +124,7 @@ public class SingleTableSet implements PanelSets {
                 .setIsSortableColums(isSortable)
                 .setServiceTables(mediatorSingleTable)
                 .setColWrappers(column)
+                .setColWrapperPopupViaBtnButYN(colWrapperPopupViaBtnButYN)
                 .build();
     }
 

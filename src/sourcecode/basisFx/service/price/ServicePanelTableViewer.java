@@ -35,6 +35,8 @@ public class ServicePanelTableViewer extends ServicePanels {
     @FXML
     private JFXToggleButton viewedToggle;
     @FXML
+    private JFXToggleButton noneBarcodeToggle;
+    @FXML
     private JFXToggleButton allToggle;
     @FXML
     private AnchorPane tableAnchor;
@@ -46,6 +48,7 @@ public class ServicePanelTableViewer extends ServicePanels {
     ToogleHandler toogleHandler_aliasToggle;
     ToogleHandler toogleHandler_viewedToggle;
     ToogleHandler toogleHandler_allToggle;
+    ToogleHandler toogleHandler_noneBarcodeToggle;
 
     SingleTableSet singleTableSet;
 
@@ -64,6 +67,7 @@ public class ServicePanelTableViewer extends ServicePanels {
          toogleHandler_aliasToggle=new ToogleHandler(aliasToggle,this);
          toogleHandler_viewedToggle=new ToogleHandler(viewedToggle,this);
          toogleHandler_allToggle=new ToogleHandler(allToggle,this);
+         toogleHandler_noneBarcodeToggle=new ToogleHandler(noneBarcodeToggle,this);
 
 
         setTooglesDisabled();
@@ -76,27 +80,13 @@ public class ServicePanelTableViewer extends ServicePanels {
 
     private void createTable() {
         WindowBuilder popup=WindowBuilder.newBuilder()
-              .setPanelCreator(() -> new DynamicContentPanel() {
-                  @Override
-                  protected void customDynamicElementsInit() {
-                      Panel.builder()
-                              .commonLabelName("Таблица представления прайса")
-                              .fxmlFileName("imageHadler")
-                              .parent(dynamicContentAnchorHolder)
-                              .build().configure();
-                  }
-              })
-              .setTitle("Архив тарифов")
+              .setTitle("Изображения")
               .setMessage(null)
-              .setFxmlFileName("ByDateResearchWindow")
+              .setFxmlFileName("PriceImgHandlerWindow")
               .setParentAnchorNameForFXML(WindowAbstraction.DefaultPanelsNames.topVisibleAnchor.name())
               .setWidth(700d)
               .setHeight(600d)
-              .setCallBack(
-                      () -> {
-                          TableWrapper tableWrapper =(TableWrapper)   Registry.mainWindow.getNodeFromMap("outer_table_wrapper");
-                          tableWrapper.getMediator().refresh(tableWrapper);
-                      })
+              .setPreClosingCallBack( () ->  singleTableSet.setItems(PriceItem.getINSTANCE().getAll()) )
               .build();
 
 
@@ -117,20 +107,25 @@ public class ServicePanelTableViewer extends ServicePanels {
                 .column(ColumnFabric.stringCol("Наименование", "name", 0.30d, true))
                 .column(ColumnFabric.stringCol("Псевдоним", "alias", 0.26d, true))
                 .column(ColumnFabric.boolCol("Вывод", "visibitity", 0.05d, true))
-                .column(ColumnFabric.popupViaBtnCol("Картинка", "Показать", 0.07d, popup,
-                        activeRecord -> {
-                            if (activeRecord != null) {
-                                if (((PriceItem) activeRecord).getImg() != null) {
-                                    return true;
-                                }
-                                return false;
-                            }
-                            return false;
-                        }
-                ))
-                .column(ColumnFabric.comboBoxCol(StoredCategory.class, "Категория ", "itemCategory", 0.18d, true))
+                .column(ColumnFabric.popupViaBtnColButYN("Картинка", "Показать", "--нет--",0.07d, popup,
+                         activeRecord -> {
+                             if (activeRecord != null) {
+                                 if (((PriceItem) activeRecord).getImg() != null) {
+                                     return true;
+                                 }
+                                 return false;
+                             }
+                             return false;
+                         }
+                 ))
+                .column(ColumnFabric.comboBoxCol(StoredCategory.class, "Категория ", "storedCategory", 0.18d, true))
                 .build();
+
         singleTableSet.configure();
+
+
+        TableWrapper tableWrapper = singleTableSet.getMediatorSingleTable().getTableWrapper();
+        Registry.dataExchanger.put("outer_table_wrapper",tableWrapper);
 
     }
 
@@ -139,6 +134,8 @@ public class ServicePanelTableViewer extends ServicePanels {
         categoryToggle.setSelected(false);
         aliasToggle.setSelected(false);
         viewedToggle.setSelected(false);
+        noneBarcodeToggle.setSelected(false);
+        allToggle.setSelected(false);
     }
 
 
@@ -156,12 +153,7 @@ public class ServicePanelTableViewer extends ServicePanels {
             imgToggle.setSelected(true);
             //to view without img
             List<ActiveRecord> recordList = PriceItem.getINSTANCE().getAll().stream()
-                    .filter(record -> {
-                        if (((PriceItem) record).getImg() == null) {
-                            return true;
-                        }
-                        return false;
-                    })
+                    .filter(record -> ((PriceItem) record).getImg() == null)
                     .collect(Collectors.toList());
             singleTableSet.setItems(recordList);
         }
@@ -170,12 +162,7 @@ public class ServicePanelTableViewer extends ServicePanels {
             categoryToggle.setSelected(true);
             //to view without category
             List<ActiveRecord> recordList = PriceItem.getINSTANCE().getAll().stream()
-                    .filter(record -> {
-                        if (((PriceItem) record).getStoredCategory() == null) {
-                            return true;
-                        }
-                        return false;
-                    })
+                    .filter(record -> ((PriceItem) record).getStoredCategory() == null)
                     .collect(Collectors.toList());
             singleTableSet.setItems(recordList);
 
@@ -185,12 +172,7 @@ public class ServicePanelTableViewer extends ServicePanels {
             aliasToggle.setSelected(true);
             //to view without alias
             List<ActiveRecord> recordList = PriceItem.getINSTANCE().getAll().stream()
-                    .filter(record -> {
-                        if (((PriceItem) record).getAlias() == null) {
-                            return true;
-                        }
-                        return false;
-                    })
+                    .filter(record -> ((PriceItem) record).getAlias() == null)
                     .collect(Collectors.toList());
             singleTableSet.setItems(recordList);
 
@@ -201,12 +183,17 @@ public class ServicePanelTableViewer extends ServicePanels {
             viewedToggle.setSelected(true);
             //to view without not viewed
             List<ActiveRecord> recordList = PriceItem.getINSTANCE().getAll().stream()
-                    .filter(record -> {
-                        if (!((PriceItem) record).getVisibitity().getBoolean()) {
-                            return true;
-                        }
-                        return false;
-                    })
+                    .filter(record -> (!((PriceItem) record).getVisibitity().getBoolean()))
+                    .collect(Collectors.toList());
+            singleTableSet.setItems(recordList);
+
+        }
+        if (node==toogleHandler_noneBarcodeToggle) {
+            setTooglesDisabled();
+            noneBarcodeToggle.setSelected(true);
+            //to view without not viewed
+            List<ActiveRecord> recordList = PriceItem.getINSTANCE().getAll().stream()
+                    .filter(record -> ((PriceItem) record).getBarcode() == null)
                     .collect(Collectors.toList());
             singleTableSet.setItems(recordList);
 

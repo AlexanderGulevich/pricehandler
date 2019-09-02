@@ -80,7 +80,7 @@ public class ColWrapperPopupViaBtn extends ColWrapper {
                 if (checkingCallBack.check(getItem())) {
                     btn = new Button(btnName);
                 }else {
-
+                    btn = new Button("---");
                 }
             }else {
                 btn = new Button(btnName);
