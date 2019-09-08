@@ -6,16 +6,11 @@ import basisFx.appCore.annotation.DataStore;
 import basisFx.appCore.utils.Registry;
 import basisFx.dataSource.BFxPreparedStatement;
 import basisFx.dataSource.Db;
-import basisFx.domain.Counterparty;
-import basisFx.domain.Example;
-import basisFx.domain.Packet;
-import basisFx.domain.PacketSize;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,18 +18,30 @@ public class PriceItem extends ActiveRecord {
     private static PriceItem INSTANCE = new PriceItem();
 
 
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true)  private SimpleObjectProperty<String> name=new SimpleObjectProperty<>(this, "name", "");
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true)  private SimpleObjectProperty<String> barcode=new SimpleObjectProperty<>(this, "barcode", "");
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true)  private SimpleObjectProperty<String> alias=new SimpleObjectProperty<>(this, "alias", "");
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true)  private SimpleObjectProperty<String> orderNumber=new SimpleObjectProperty<>(this, "orderNumber", "");
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<String> pure_order=new SimpleObjectProperty<>(this, "pure_order", "");
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<String> measure=new SimpleObjectProperty<>(this, "measure", "");
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<String> amountInBox=new SimpleObjectProperty<>(this, "amountInBox", "");
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<StoredCategory> storedCategory= new SimpleObjectProperty<>(this, "storedCategory",  null );
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<Double> amountInPrice=new SimpleObjectProperty<>(this, "amountInPrice", null);
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<Double> pricePerUnit=new SimpleObjectProperty<>(this, "pricePerUnit", null);
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<BoolComboBox> visibitity=new SimpleObjectProperty<>(this, "visibitity", new BoolComboBox(true));
-    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true)private SimpleObjectProperty<Img> img=new SimpleObjectProperty<>(this, "img", null);
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true)  private SimpleObjectProperty<String> name=
+            new SimpleObjectProperty<>(this, "name", null);
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true)  private SimpleObjectProperty<String> barcode=
+            new SimpleObjectProperty<>(this, "barcode", null);
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true)  private SimpleObjectProperty<String> alias=
+            new SimpleObjectProperty<>(this, "alias", null);
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true)  private SimpleObjectProperty<String> orderNumber=
+            new SimpleObjectProperty<>(this, "orderNumber", null);
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<String> pure_order=
+            new SimpleObjectProperty<>(this, "pure_order", null);
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<String> measure=
+            new SimpleObjectProperty<>(this, "measure", null);
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<String> amountInBox=
+            new SimpleObjectProperty<>(this, "amountInBox", null);
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<StoredCategory> storedCategory=
+            new SimpleObjectProperty<>(this, "storedCategory",  null );
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<Double> amountInPrice=
+            new SimpleObjectProperty<>(this, "amountInPrice", null);
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<Double> pricePerUnit=
+            new SimpleObjectProperty<>(this, "pricePerUnit", null);
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true) private SimpleObjectProperty<BoolComboBox> visibitity=
+            new SimpleObjectProperty<>(this, "visibitity", new BoolComboBox(true));
+    @DataStore(NOT_CHECK_FOR_TRANSACTIONS = true)private SimpleObjectProperty<Img> img=
+            new SimpleObjectProperty<>(this, "img", null);
 
 
     public static PriceItem getINSTANCE() {
@@ -42,7 +49,10 @@ public class PriceItem extends ActiveRecord {
     }
     @Override
     public String toString() {
-        return null;
+        if (getAlias() != null) {
+            return getAlias();
+        }
+        return getName();
     }
 
 
@@ -56,6 +66,7 @@ public class PriceItem extends ActiveRecord {
             if (!filledItems) {
                 priceAllRecords.forEach((record -> {
                     PriceItem priceItem = (PriceItem) record;
+
                     priceItem.setImg( Img.getINSTANCE().find(priceItem) );
                     priceItem.setStoredCategory(priceItem.findStoredCategory() );
                     priceItem.setAlias(priceItem.findAlias() );
@@ -63,6 +74,23 @@ public class PriceItem extends ActiveRecord {
                 }));
                 price.setFilledItems(true);
             }
+            return priceAllRecords;
+        } Registry.windowFabric.infoWindow("Чтобы отобразить данные сначала загрузите прайс!");
+        return null;
+    }
+    public ObservableList<ActiveRecord> getAllWithImg() {
+        Price price = (Price) Registry.dataExchanger.get("price");
+        if (price != null) {
+            ObservableList<ActiveRecord> priceAllRecords = price.getAllRecords();
+                priceAllRecords.forEach((record -> {
+                    PriceItem priceItem = (PriceItem) record;
+
+                    priceItem.setImg( Img.getINSTANCE().find(priceItem) );
+                    priceItem.setStoredCategory(priceItem.findStoredCategory() );
+                    priceItem.setAlias(priceItem.findAlias() );
+                    priceItem.setVisibitity(new BoolComboBox(priceItem.findVisibility()));
+                }));
+                price.setFilledItems(true);
             return priceAllRecords;
         } Registry.windowFabric.infoWindow("Чтобы отобразить данные сначала загрузите прайс!");
         return null;
@@ -101,6 +129,18 @@ public class PriceItem extends ActiveRecord {
     @Override
     public void update() {
 
+        Boolean byBarcodeAndPureOrder = findByBarcodeAndPureOrder();
+        if (byBarcodeAndPureOrder) {
+            updateBuOrderAndBarcode();
+        }
+        else if(findByPureOrder() && !byBarcodeAndPureOrder){
+            updateByPureOrder();
+        }
+
+
+    }
+
+    private void updateBuOrderAndBarcode() {
         String expression = "UPDATE " + this.entityName + " SET  "
                 + " storedCategoryId =?,  "
                 + " imgId  =?,  "
@@ -119,10 +159,13 @@ public class PriceItem extends ActiveRecord {
         }else {
             pstmt.setNull(1, Types.INTEGER );
         }
-        Integer id_Img = null;
-        if (getImg() != null) {
-            id_Img=getImg().getId();
-            pstmt.setInt(2, id_Img);
+        if (getImg() != null   ) {
+            if (getBarcode() != null) {
+                Img img = Img.getINSTANCE().find(this);
+                pstmt.setInt(2, img.getId());
+            }
+
+
         }else {
             pstmt.setNull(2, Types.INTEGER);
         }
@@ -139,52 +182,107 @@ public class PriceItem extends ActiveRecord {
         }
     }
 
+    public void updateByPureOrder() {
+        String expression = "UPDATE " + this.entityName + " SET  "
+                + " storedCategoryId =?,  "
+                + " imgId  =?,  "
+                + " name  =?,  "
+                + " alias  =?,  "
+                + " orderNumber=?,  "
+                + " visibitity =?  "
+                +" WHERE    pure_order =? and barcode is null";
+        try {
+            PreparedStatement pstmt = Db.connection.prepareStatement(expression);
+
+        Integer id_StoredCategory = null;
+        if (getStoredCategory() != null && getStoredCategory().getId()!=null) {
+            id_StoredCategory=getStoredCategory().getId();
+                pstmt.setInt(1, id_StoredCategory);
+        }else {
+            pstmt.setNull(1, Types.INTEGER );
+        }
+        Integer id_Img = null;
+            if (getImg() != null   ) {
+                if (getBarcode() != null) {
+                    Img img = Img.getINSTANCE().find(this);
+                    pstmt.setInt(2, img.getId());
+                }
+
+
+            }else {
+            pstmt.setNull(2, Types.INTEGER);
+        }
+            pstmt.setString(3, getName());
+            pstmt.setString(4, getAlias());
+            pstmt.setString(5, getOrderNumber());
+            pstmt.setBoolean(6, getVisibitity().getBoolean());
+            pstmt.setString(7,getPure_order());
+
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void insert() {
-        if (findByBarcodeAndPureOrder()) {
+
+        Boolean byBarcodeAndPureOrder = findByBarcodeAndPureOrder();
+        Boolean byPureOrder = findByPureOrder();
+        if (byBarcodeAndPureOrder) {
             update();
-        }else {
-            try {
-                String expression = "INSERT INTO " + this.entityName
-                        + "("
-                        + " storedCategoryId ,  "
-                        + " imgId  ,  "
-                        + " name  ,  "
-                        + " alias  ,  "
-                        + " barcode ,  "
-                        + " orderNumber,  "
-                        + " pure_order,  "
-                        + " visibitity   "
-                        + ") VALUES(?,?,?,?,?,?,?,?)";
+        }
+        else if(byPureOrder && !byBarcodeAndPureOrder){
+            updateByPureOrder();
+        } else {
+            insertNew();
+        }
+    }
+
+    private void insertNew() {
+        try {
+            String expression = "INSERT INTO " + this.entityName
+                    + "("
+                    + " storedCategoryId ,  "
+                    + " imgId  ,  "
+                    + " name  ,  "
+                    + " alias  ,  "
+                    + " barcode ,  "
+                    + " orderNumber,  "
+                    + " pure_order,  "
+                    + " visibitity   "
+                    + ") VALUES(?,?,?,?,?,?,?,?)";
 
 
-                PreparedStatement pstmt = Db.connection.prepareStatement(expression);
+            PreparedStatement pstmt = Db.connection.prepareStatement(expression);
 
-                Integer id_StoredCategory = null;
-                if (getStoredCategory() != null) {
-                    id_StoredCategory=getStoredCategory().getId();
-                    pstmt.setInt(1, id_StoredCategory);
-                }else {
-                    pstmt.setNull(1, Types.INTEGER );
-                }
-                Integer id_Img = null;
-                if (getImg() != null) {
-                    id_Img=getImg().getId();
-                    pstmt.setInt(2, id_Img);
-                }else {
-                    pstmt.setNull(2, Types.INTEGER);
-                }
-
-                pstmt.setString(3, getName());
-                pstmt.setString(4, getAlias());
-                pstmt.setString(5, getBarcode());
-                pstmt.setString(6, getOrderNumber());
-                pstmt.setString(7, getPure_order());
-                pstmt.setBoolean(8, getVisibitity().getBoolean());
-                pstmt.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            Integer id_StoredCategory = null;
+            if (getStoredCategory() != null) {
+                id_StoredCategory=getStoredCategory().getId();
+                pstmt.setInt(1, id_StoredCategory);
+            }else {
+                pstmt.setNull(1, Types.INTEGER );
             }
+            if (getImg() != null   ) {
+                if (getBarcode() != null) {
+                    Img img = Img.getINSTANCE().find(this);
+                    pstmt.setInt(2, img.getId());
+                }
+
+
+            }else {
+                pstmt.setNull(2, Types.INTEGER);
+            }
+
+            pstmt.setString(3, getName());
+            pstmt.setString(4, getAlias());
+            pstmt.setString(5, getBarcode());
+            pstmt.setString(6, getOrderNumber());
+            pstmt.setString(7, getPure_order());
+            pstmt.setBoolean(8, getVisibitity().getBoolean());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -196,7 +294,43 @@ public class PriceItem extends ActiveRecord {
                 .executeAndCheck();
     }
 
+    public Boolean findByPureOrder() {
+        return BFxPreparedStatement.create("SELECT * FROM " +entityName+" WHERE barcode is null and pure_order=? ")
+                .setString(1,getPure_order())
+                .executeAndCheck();
+    }
+
     public StoredCategory findStoredCategory() {
+        if (getBarcode() != null) {
+            return findStoredCategoryByBarcodeAndOrder();
+        }else{
+            return findStoredCategoryByOrder();
+        }
+    }
+
+    private StoredCategory findStoredCategoryByOrder() {
+        List<ActiveRecord> collect = getAllFromDB().stream().filter(record -> {
+            PriceItem priceItem = (PriceItem) record;
+            String pure_order = priceItem.getPure_order();
+            if (getPure_order()!=null) {
+                if (getPure_order() .equals(pure_order)) { return true; }return false;
+            }else {return  false;}
+
+        }).collect(Collectors.toList());
+
+        int length = collect.toArray().length;
+        if (length > 1) {
+            Registry.windowFabric .infoWindow( "Что-то пошло не так: в бд есть две или более записи  с одним и тем же штрихкодом и номером заказа\n" + "штрихкод-" + getBarcode() + "\n заказ-" + getOrderNumber());
+        }
+        if (length == 1) {
+            PriceItem priceItem = (PriceItem) collect.get(0);
+            return priceItem.getStoredCategory();
+        }
+
+        return null;
+    }
+
+    private StoredCategory findStoredCategoryByBarcodeAndOrder() {
         List<ActiveRecord> collect = getAllFromDB().stream().filter(record -> {
             PriceItem priceItem = (PriceItem) record;
             String barcode = priceItem.getBarcode();
@@ -209,9 +343,7 @@ public class PriceItem extends ActiveRecord {
 
         int length = collect.toArray().length;
         if (length > 1) {
-            Registry.windowFabric .infoWindow( "Что-то пошло не так: в бд есть две или более записи " +
-                    "с одним и тем же штрихкодом и номером заказа\n" +
-                    "штрихкод-" + getBarcode() + "\n заказ-" + getOrderNumber());
+            Registry.windowFabric .infoWindow( "Что-то пошло не так: в бд есть две или более записи  с одним и тем же штрихкодом и номером заказа\n" + "штрихкод-" + getBarcode() + "\n заказ-" + getOrderNumber());
         }
         if (length == 1) {
             PriceItem priceItem = (PriceItem) collect.get(0);
@@ -219,12 +351,46 @@ public class PriceItem extends ActiveRecord {
         }
 
         return null;
-
     }
 
 
-
     public String findAlias() {
+
+        if (getBarcode() != null) {
+            return findAliasByBarcodeAndOrder();
+        }else {
+            return findAliasByOrder();
+        }
+    }
+
+    private String findAliasByOrder() {
+        List<ActiveRecord> collect = getAllFromDB().stream().filter(record -> {
+            PriceItem priceItem = (PriceItem) record;
+            String pure_order = priceItem.getPure_order();
+            if ( getPure_order()!=null) {
+                if ( getPure_order() .equals(pure_order)) { return true; }return false;
+            }else {return  false;}
+        }).collect(Collectors.toList());
+
+        int length = collect.toArray().length;
+        if (length > 1) {
+            Registry.windowFabric
+                    .infoWindow(
+                            "Что-то пошло не так: в бд есть две или более записи " +
+                                    "с одним и тем же штрихкодом и номером заказа\n" +
+                                    "штрихкод-" + getBarcode() +
+                                    "\n заказ-" + getOrderNumber()
+                    );
+        }
+        if (length == 1) {
+            PriceItem priceItem = (PriceItem) collect.get(0);
+            return priceItem.getAlias();
+        }
+
+        return null;
+    }
+
+    private String findAliasByBarcodeAndOrder() {
         List<ActiveRecord> collect = getAllFromDB().stream().filter(record -> {
             PriceItem priceItem = (PriceItem) record;
             String barcode = priceItem.getBarcode();
@@ -250,12 +416,50 @@ public class PriceItem extends ActiveRecord {
         }
 
         return null;
-
     }
 
 
-
     public Boolean findVisibility() {
+        if (getBarcode() != null) {
+            return findVisibilityByDarcodeAndOrder();
+        }else{
+            return findVisibilityByOrder();
+        }
+
+
+
+
+
+    }
+
+    private Boolean findVisibilityByOrder() {
+        List<ActiveRecord> collect = getAllFromDB().stream().filter(record -> {
+            PriceItem priceItem = (PriceItem) record;
+            String pure_order = priceItem.getPure_order();
+            if (  getPure_order()!=null) {
+                if (getPure_order() .equals(pure_order)) { return true; }return false;
+            }else {return  false;}
+        }).collect(Collectors.toList());
+
+        int length = collect.toArray().length;
+        if (length > 1) {
+            Registry.windowFabric
+                    .infoWindow(
+                            "Что-то пошло не так: в бд есть две или более записи " +
+                                    "с одним и тем же штрихкодом и номером заказа\n" +
+                                    "штрихкод-" + getBarcode() +
+                                    "\n заказ-" + getOrderNumber()
+                    );
+        }
+        if (length == 1) {
+            PriceItem priceItem = (PriceItem) collect.get(0);
+            return priceItem.getVisibitity().getBoolean();
+        }
+
+        return true;
+    }
+
+    private Boolean findVisibilityByDarcodeAndOrder() {
         List<ActiveRecord> collect = getAllFromDB().stream().filter(record -> {
             PriceItem priceItem = (PriceItem) record;
             String barcode = priceItem.getBarcode();
@@ -281,7 +485,6 @@ public class PriceItem extends ActiveRecord {
         }
 
         return true;
-
     }
 
 

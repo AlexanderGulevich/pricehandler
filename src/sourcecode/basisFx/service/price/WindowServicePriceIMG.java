@@ -95,6 +95,7 @@ public  class WindowServicePriceIMG extends WindowService {
                 imgview.setImage(image1);
                 imgview.setFitHeight(333);
                 clickedDomain.setImg(img);
+                clickedDomain.insert();
                 //todo
                 ObservableList<ActiveRecord> all = PriceItem.getINSTANCE().getAll();
                 outer_table_wrapper.setItems(all);

@@ -3,27 +3,18 @@ package basisFx.service.price;
 import basisFx.appCore.events.DirectoryChosserEvent;
 import basisFx.appCore.events.FileChooser;
 import basisFx.appCore.utils.ImgExstensions;
-import basisFx.appCore.utils.OfficeExtensions;
 import basisFx.appCore.utils.Registry;
 import basisFx.domain.price.Img;
-import basisFx.domain.price.Price;
-import basisFx.domain.price.WritePrice;
 import basisFx.service.ServicePanels;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXCheckBox;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import lombok.Setter;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 

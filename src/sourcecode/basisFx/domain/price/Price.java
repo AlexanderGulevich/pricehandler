@@ -14,6 +14,8 @@ public class Price  {
 
     @Getter @Setter
     private ArrayList<PriceCategory> categoriesArrayList=new ArrayList<>();
+    @Getter @Setter
+    private ArrayList<PriceCategory> newCategoriesArrayListToCustomeOutput=new ArrayList<>();
     @Getter
     private ObservableList<ActiveRecord> allRecords= FXCollections.observableArrayList();
 
@@ -32,15 +34,18 @@ public class Price  {
         this.allFromDB = null;
     }
 
-    public void createCategory(String name, ArrayList<PriceItem> categoryFilds){
+    public void createCategory(String name, ArrayList<PriceItem> priceItems){
 
         PriceCategory category=new PriceCategory();
-        category.setFilds(categoryFilds);
+        category.setFilds(priceItems);
         category.setName(name);
         categoriesArrayList.add(category);
-        allRecords.addAll(categoryFilds);
+        allRecords.addAll(priceItems);
 
     }
+
+
+
 
 
 

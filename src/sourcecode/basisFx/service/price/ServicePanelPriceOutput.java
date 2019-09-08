@@ -16,10 +16,7 @@ import basisFx.appCore.utils.FXMLLoader;
 import basisFx.appCore.utils.Registry;
 import basisFx.appCore.windows.WindowAbstraction;
 import basisFx.appCore.windows.WindowBuilder;
-import basisFx.domain.price.OutputTemplate;
-import basisFx.domain.price.Price;
-import basisFx.domain.price.StoredCategory;
-import basisFx.domain.price.WritePrice;
+import basisFx.domain.price.*;
 import basisFx.service.ServicePanels;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
@@ -33,9 +30,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -258,12 +253,13 @@ public class ServicePanelPriceOutput extends ServicePanels {
                 .setFxmlFileName("AddDellPopupWindow")
                 .setParentAnchorNameForFXML(WindowAbstraction.DefaultPanelsNames.topVisibleAnchor.name())
                 .setWidth(700d).setHeight(600d)
-                .setPreClosingCallBack( () -> {
-                    comboboxAdapter.refresh();
-                            })
+//                .setPreClosingCallBack( () -> {
+//                    comboboxAdapter.refresh();
+//                            })
                 .setCallBackParametrized( clickedDomain ->{
                     OutputTemplate record = (OutputTemplate) clickedDomain;
-                    comboboxAdapter.choiceItem(record);
+                    comboboxAdapter.refresh();
+                    comboboxAdapter.choiceItemById(record);
                 } )
                 .build();
 
@@ -287,34 +283,113 @@ public class ServicePanelPriceOutput extends ServicePanels {
     @Override
     public void inform(Object node) {
         if (node==output) {
-
-            String path = directoryChosserEvent.getPath();
-            Price price = (Price) Registry.dataExchanger.get("price");
-            new WritePrice(price, path);
-
-
+            write();
         }
         if (node==tamplateCombobox) {
-            noneSelectionForAllAction();
-            OutputTemplate outputTemplate = ((OutputTemplate) comboboxAdapter.getSelected());
-            ArrayList<Integer> storedCategoryIdList = outputTemplate.getStoredCategory();
-            for (Integer id : storedCategoryIdList) {
-                CheckBoxAdapter checkBoxAdapter = getCheckBoxHandlerById(id);
+            tamplateChoice();
+        }
+        if ( node.getClass()== CheckBoxAdapter.class) {
+            categoryChoice((CheckBoxAdapter) node);
+        }
+
+
+    }
+
+    private void categoryChoice(CheckBoxAdapter node) {
+        CheckBoxAdapter checkBoxAdapter = node;
+        JFXCheckBox jfxCheckBox = checkBoxAdapter.getJfxCheckBox();
+        StoredCategory record = (StoredCategory) checkBoxAdapter.getRecord();
+        jfxCheckBoxSwitchBehaviour(jfxCheckBox, record);
+    }
+
+    private void tamplateChoice() {
+        noneSelectionForAllAction();
+        OutputTemplate outputTemplate = ((OutputTemplate) comboboxAdapter.getSelected());
+        ArrayList<Integer> storedCategoryIdList = outputTemplate.getStoredCategory();
+        for (Integer id : storedCategoryIdList) {
+            CheckBoxAdapter checkBoxAdapter = getCheckBoxHandlerById(id);
+            if (checkBoxAdapter != null) {
                 checkBoxAdapter.getJfxCheckBox().setSelected(true);
                 jfxCheckBoxSwitchBehaviour(checkBoxAdapter.getJfxCheckBox(),(StoredCategory) checkBoxAdapter.getRecord());
             }
 
-
-
         }
-        if ( node.getClass()== CheckBoxAdapter.class) {
-            CheckBoxAdapter checkBoxAdapter = (CheckBoxAdapter) node;
-            JFXCheckBox jfxCheckBox = checkBoxAdapter.getJfxCheckBox();
-            StoredCategory record = (StoredCategory) checkBoxAdapter.getRecord();
-            jfxCheckBoxSwitchBehaviour(jfxCheckBox, record);
+    }
+
+    private void write() {
+        String path = directoryChosserEvent.getPath();
+        Price price = (Price) Registry.dataExchanger.get("price");
+        boolean bigImgSize = swichImgSize.isSelected();
+        boolean imgExistatnt = addImage.isSelected();
+        boolean standatrCategorySelected = standatrCategory.isSelected();
+
+        if (!standatrCategorySelected) {
+            List<CheckBoxAdapter> checkBoxAdapters_ACTIVE = getActiveCheckBoxHandlersArrayList();
+            Map<Integer, JFXCheckBox> jfxCheckBoxMap = activeCheckBoxHandlersArrayListToMAP(checkBoxAdapters_ACTIVE);
+            List<ActiveRecord> filtered = filterRecords(jfxCheckBoxMap);
+            Map<String, List<ActiveRecord>> filteredWithNameCategories = filteredWithNameCategories(filtered);
+            Price newPrice = createPriceWithCustomeCategories(filteredWithNameCategories);
+            newPrice.setPriceDate(price.getPriceDate());
+            newPrice.setPriceDateString(price.getPriceDateString());
+            new WriterForPrice(newPrice, path,bigImgSize,imgExistatnt);
+        }else {
+            new WriterForPrice(price, path,bigImgSize,imgExistatnt);
         }
 
 
+    }
+
+    private Map<Integer, JFXCheckBox> activeCheckBoxHandlersArrayListToMAP(List<CheckBoxAdapter> checkBoxAdapters_ACTIVE) {
+        return checkBoxAdapters_ACTIVE.stream().collect(Collectors.toMap(o -> o.getRecord().getId(), o -> o.getJfxCheckBox()));
+    }
+
+    private List<CheckBoxAdapter> getActiveCheckBoxHandlersArrayList() {
+        return checkBoxHandlersArrayList.stream()
+                    .filter(checkBoxAdapter -> checkBoxAdapter.getJfxCheckBox().isSelected())
+                    .collect(Collectors.toList());
+    }
+
+    private Price createPriceWithCustomeCategories(Map<String, List<ActiveRecord>> filteredWithNameCategories) {
+        Price price=new Price();
+        Set<Map.Entry<String, List<ActiveRecord>>> entries = filteredWithNameCategories.entrySet();
+
+        List<Map.Entry<String, List<ActiveRecord>>> sortedCategories = entries.stream().sorted((o1, o2) -> {
+            Integer rankFirst = ((PriceItem) o1.getValue().get(0)).getStoredCategory().getRank();
+            Integer rankSecond = ((PriceItem) o2.getValue().get(0)).getStoredCategory().getRank();
+            return rankFirst.compareTo(rankSecond);
+        }).collect(Collectors.toList());
+
+
+        sortedCategories.forEach(entry -> {
+            ArrayList<PriceItem> list = new ArrayList<>();
+            List<PriceItem> items = entry.getValue().stream().map(record -> ((PriceItem) record)).collect(Collectors.toList());
+            List<PriceItem> priceItems = items.stream().sorted(Comparator.comparing(priceItem -> priceItem.toString())).collect(Collectors.toList());
+            list.addAll(priceItems);
+            price.createCategory(entry.getKey(),list);
+        });
+        return price;
+    }
+
+    private Map<String, List<ActiveRecord>> filteredWithNameCategories(List<ActiveRecord> activeRecordsFiltered) {
+        Map<String, List<ActiveRecord>> map = activeRecordsFiltered.stream()
+                .collect(Collectors.groupingBy(o -> ((PriceItem) o).getStoredCategory().getName()));
+
+       return map;
+    }
+
+    private List<ActiveRecord> filterRecords(Map<Integer, JFXCheckBox> jfxCheckBoxMap) {
+        return PriceItem.getINSTANCE().getAllWithImg().stream().filter(record -> {
+                PriceItem priceItem = ((PriceItem) record);
+                StoredCategory storedCategory = priceItem.getStoredCategory();
+                if (storedCategory!=null && storedCategory.getId() != null) {
+                    Integer id = storedCategory.getId();
+                    JFXCheckBox box = jfxCheckBoxMap.get(id);
+                    if (box != null) {
+                        return true;
+                    }
+                }
+                return false;
+            }).collect(Collectors.toList());
     }
 
     private CheckBoxAdapter getCheckBoxHandlerById(Integer id) {
@@ -325,8 +400,13 @@ public class ServicePanelPriceOutput extends ServicePanels {
             return id_from_checkBoxHandlersArrayList.equals(id);
         })
                 .findAny();
-        CheckBoxAdapter checkBoxAdapter = first.get();
-        return checkBoxAdapter;
+
+        if (first.isPresent()) {
+            CheckBoxAdapter checkBoxAdapter = first.get();
+            return checkBoxAdapter;
+        }
+        return null;
+
     }
 
     private void jfxCheckBoxSwitchBehaviour(JFXCheckBox jfxCheckBox, StoredCategory record) {

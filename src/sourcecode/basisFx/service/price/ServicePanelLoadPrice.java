@@ -1,8 +1,6 @@
 package basisFx.service.price;
 
 import basisFx.appCore.events.FileChooser;
-import basisFx.appCore.settings.FontsStore;
-import basisFx.appCore.utils.FontLogic;
 import basisFx.appCore.utils.OfficeExtensions;
 import basisFx.appCore.utils.Registry;
 import basisFx.domain.price.Price;
@@ -34,6 +32,8 @@ public class ServicePanelLoadPrice extends ServicePanels {
 
     FileChooser fileChooser;
 
+    static String path;
+
     @FXML
     private AnchorPane panelAnchor;
 
@@ -44,6 +44,13 @@ public class ServicePanelLoadPrice extends ServicePanels {
         fileChooser = new FileChooser(new OfficeExtensions());
         fileChooser.setEventToElement( load);
         fileChooser.setMediator(this);
+        if (Registry.dataExchanger.get("PriceMessage") != null) {
+            Price price = (Price) Registry.dataExchanger.get("price");
+            setMessage(price);
+        }
+        textfield.setText(path);
+
+
     }
 
 
@@ -62,8 +69,9 @@ public class ServicePanelLoadPrice extends ServicePanels {
     @Override
     public void inform(Object node) {
         if (node==load) {
+            path=fileChooser.getFiles().get(0).getAbsolutePath();
             textarea.clear();
-            textfield.setText(fileChooser.getFiles().get(0).getAbsolutePath());
+            textfield.setText(path);
             List<File> files = fileChooser.getFiles();
             PriceReader priceReader = new PriceReader(files.get(0));
             Price price = priceReader.getPrice();

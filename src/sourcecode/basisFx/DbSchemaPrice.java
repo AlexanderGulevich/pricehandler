@@ -32,8 +32,8 @@ public class DbSchemaPrice extends DbSchema {
                 + "	orderNumber  VARCHAR(15),  "
                 + "	pure_order  VARCHAR(15),  "
                 + "	visibitity Boolean,  "
-                + " FOREIGN KEY (storedCategoryId) REFERENCES StoredCategory(id) on delete cascade , "
-                + " FOREIGN KEY (imgId) REFERENCES IMG(id) on delete cascade , "
+                + " FOREIGN KEY (storedCategoryId) REFERENCES StoredCategory(id) on delete SET NULL  , "
+                + " FOREIGN KEY (imgId) REFERENCES IMG(id) on delete SET NULL, "
                 + " UNIQUE  (barcode, pure_order)"
                 + ")";
 

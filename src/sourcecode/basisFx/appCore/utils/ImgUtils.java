@@ -110,6 +110,35 @@ public class ImgUtils {
         ImageIO.write(bufferedImage,"png", os);
         return new ByteArrayInputStream(os.toByteArray());
     }
+    public static ByteArrayOutputStream toOutputStream(BufferedImage bufferedImage) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage,"png", os);
+        return  os;
+    }
+
+
+    public static ByteArrayOutputStream toByteArrayOutputStream(File f) throws IOException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] picData;
+        int b;
+
+        FileInputStream fis = new FileInputStream(f.getAbsolutePath());
+        if (f.exists()) {
+
+            while ((b = fis.read()) != -1) {
+                baos.write(b);
+            }
+            picData = IOUtils.toByteArray(fis);
+
+            fis.close();
+
+            return baos;
+
+        }
+        return null;
+    }
+
 
 
 }

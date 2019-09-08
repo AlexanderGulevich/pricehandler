@@ -64,24 +64,8 @@ public class MainMenuSketch implements MenuSketch {
 //        ) ;
 
 
-        menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
-                .panelCreator(  () -> new DynamicContentPanel() {
-                    @Override
-                    protected void customDynamicElementsInit() {
-                        Panel.builder()
-                                .commonLabelName("Таблица представления прайса")
-                                .fxmlFileName("priceTableViewer")
-                                .parent(dynamicContentAnchorHolder)
-                                .build().configure();
-                    }
-                })
-                    .description("Управление категориями")
-                    .fontsStore(FAWESOME5SOLID)
-                    .fxmlFileName("vbut.fxml")
-                    .fontSymbol("\uF0CB")
-                    .fontSize(iconSize)
-                    .build()
-        ) ;
+
+
 
 
 
@@ -96,7 +80,7 @@ public class MainMenuSketch implements MenuSketch {
                                 .build().configure();
                     }
                 })
-                .description("Выгрузка прайса и настройка параметров, шаблоны \n")
+                .description("Управление категориями вывода, картинками \n")
                 .fontsStore(FAWESOME5SOLID)
                 .fxmlFileName("vbut.fxml")
                 .fontSymbol("\uF093")
@@ -104,6 +88,31 @@ public class MainMenuSketch implements MenuSketch {
                 .fontSize(iconSize)
                 .build()
         );
+
+
+
+
+
+
+        menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
+                .panelCreator(  () -> new DynamicContentPanel() {
+                    @Override
+                    protected void customDynamicElementsInit() {
+                        Panel.builder()
+                                .commonLabelName("Таблица представления прайса")
+                                .fxmlFileName("priceTableViewer")
+                                .parent(dynamicContentAnchorHolder)
+                                .build().configure();
+                    }
+                })
+                    .description("Загруженный прайс")
+                    .fontsStore(FAWESOME5SOLID)
+                    .fxmlFileName("vbut.fxml")
+                    .fontSymbol("\uF0CB")
+                    .fontSize(iconSize)
+                    .build()
+        ) ;
+
 
 
 

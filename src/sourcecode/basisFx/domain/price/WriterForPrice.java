@@ -12,12 +12,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static basisFx.appCore.poi.CellStylesStore.StyleKind.*;
 
-public class WritePrice extends Writer {
+public class WriterForPrice extends Writer {
     protected StringHandler strHandler;
     protected HSSFWorkbook workbook;
     protected FileOutputStream out;
@@ -38,10 +42,18 @@ public class WritePrice extends Writer {
     int last = 9;
     private CellHandler cellHandler;
 
-    public WritePrice(Price pr, String path) {
+    boolean bigImgSize ;
+    boolean imgExistatnt ;
+
+
+
+    public WriterForPrice(Price pr, String path, boolean bigImgSize, boolean imgExistatnt) {
         this.price = pr;
         this.path = path;
         this.categoriesArrayList = pr.getCategoriesArrayList();
+
+        this.bigImgSize=bigImgSize;
+        this.imgExistatnt=imgExistatnt;
 
         strHandler = new StringHandler();
         workbook = new HSSFWorkbook();
@@ -233,30 +245,31 @@ public class WritePrice extends Writer {
         for (Iterator it = categoriesArrayList.iterator(); it.hasNext(); ) {
             PriceCategory pc = (PriceCategory) it.next();
 
-            createCategory(firstColIndex, "                * " + pc.getName(), last, TABLECATEGORY);
+            createCategory(firstColIndex, "                * " + pc.getName().toUpperCase(), last, TABLECATEGORY);
 
             row.setHeightInPoints(15);
             createNewRow();
 
-            for (PriceItem filds : pc.getFilds()) {
+            ArrayList<PriceItem> priceItems = pc.getFilds();
+            List<PriceItem> collect = priceItems.stream().sorted(Comparator.comparing(priceItem -> priceItem.toString())).collect(Collectors.toList());
+            priceItems.clear();
+            priceItems.addAll(collect);
 
-                row.setHeightInPoints(15);
-                createOrder(filds);
-                createBarcode(filds);
-                createName(filds);
-                createAmountInBox(filds);
-                createPricePerUnit(filds);
-                createAmountInPrice(filds);
-                createBlankLastCol();
-                createNewRow();
-
-
+            for (PriceItem filds : priceItems) {
+                if (filds.getVisibitity().getBoolean()) {
+                    row.setHeightInPoints(15);
+                    createOrder(filds);
+                    createBarcode(filds);
+                    createName(filds);
+                    createMeasure(filds);
+                    createAmountInBox(filds);
+                    createPricePerUnit(filds);
+                    createAmountInPrice(filds);
+                    createBlankLastCol();
+                    createNewRow();
+                }
             }
-
-
         }
-
-
     }
 
     private void createOrder(PriceItem filds) {
@@ -306,10 +319,24 @@ public class WritePrice extends Writer {
     }
 
     private void createName(PriceItem filds) {
+
+        String name;
+        if (filds.getAlias() != null) {
+            name=filds.getAlias();
+        }else {
+            name=filds.getName();
+        }
+
         cellHandler.setCell(row.createCell(firstColIndex + 2))
-                .setCellValue("  " + filds.getName())
+                .setCellValue("  " + name)
                 .addMergedRegion(row.getRowNum(), row.getRowNum(), firstColIndex + 2, firstColIndex + 3)
                 .multipleSetStyle(row, firstColIndex + 2, firstColIndex + 4, PERMANENTDATASTRING);
+    }
+
+    private void createMeasure(PriceItem filds) {
+        cellHandler.setCell(row.createCell(firstColIndex + 4))
+                .setCellValue("  " + filds.getMeasure())
+                .setCellStyle(PERMANENTDATASTRING);
     }
 
     private void createBarcode(PriceItem filds) {
@@ -317,21 +344,23 @@ public class WritePrice extends Writer {
         String barcode = filds.getBarcode();
         if (barcode != null) {
 
-//            if (filds.getImg() != null) {
-            if (true) {
+            if (imgExistatnt && filds.getImg() != null && filds.getImg().getImgBig()!=null&& filds.getImg().getImgSmall()!=null) {
                 cellHandler.setCell(row.createCell(firstColIndex + 1))
                         .setCellValue("  " + filds.getBarcode())
                         .setCellStyle(ORANGE_FILLED_CELL_9_Brown_TEXT);
-
                 try {
-                    CommentUtils.setComment(workbook, spreadsheet, cellHandler.getCell());
+                    if (imgExistatnt) {
+                        try {
+                                CommentUtils.setComment(workbook, spreadsheet, cellHandler.getCell(), filds,bigImgSize);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-
             } else {
-
                 cellHandler.setCell(row.createCell(firstColIndex + 1))
                         .setCellValue("  " + filds.getBarcode())
                         .setCellStyle(NOT_FILLED_CELL_9_BLUE_TEXT);
