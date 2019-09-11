@@ -13,7 +13,7 @@ public class DbServer extends Db{
 
     protected Statement statement = null;
     private String db_name=PropertiesUtils.getProperty("db_name");
-        private String db_path=PropertiesUtils.getProperty("db_path");
+    private String db_path=PropertiesUtils.getProperty("db_path");
     private String db_folder=PropertiesUtils.getProperty("db_folder");
     private DbSchema dbSchema;
 
