@@ -12,7 +12,7 @@ import basisFx.appCore.guiStructura.LeftAndTopMenuGUI;
 import basisFx.appCore.windows.WindowFabric;
 import basisFx.dataSource.DbFactory;
 import javafx.stage.Stage;
-import org.scenicview.ScenicView;
+//import org.scenicview.ScenicView;
 
 
 
