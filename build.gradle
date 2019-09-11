@@ -14,7 +14,7 @@ sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 //GRADLE
-task wrapper(type: Wrapper) { gradleVersion = '4.3.1' }
+task customeWrapper(type: Wrapper) { gradleVersion = '4.3.1' }
 
 ext {
     author = "Alexander Gulevich"
