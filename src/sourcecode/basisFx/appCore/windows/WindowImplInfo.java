@@ -21,6 +21,8 @@ public class WindowImplInfo extends WindowImpl{
     @Override
     public void customInit(WindowAbstraction windowAbstraction) {
         ((WindowServiceInfo) windowService).setMessage(builder.message);
+        setWindowAbstraction(windowAbstraction);
+        windowAbstraction.stage.setAlwaysOnTop(true);
     }
 
     @Override
