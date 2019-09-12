@@ -7,71 +7,114 @@ import java.sql.Statement;
 
 import basisFx.appCore.utils.PropertiesUtils;
 import basisFx.appCore.utils.Registry;
+import org.hsqldb.Server;
 import org.hsqldb.persist.HsqlProperties;
 
 public class DbServer extends Db{
 
-    protected Statement statement = null;
-    private String db_name=PropertiesUtils.getProperty("db_name");
-    private String db_path=PropertiesUtils.getProperty("db_path");
-    private String db_folder=PropertiesUtils.getProperty("db_folder");
-    private DbSchema dbSchema;
 
-    public DbServer(DbSchema dbSchema)  {
+    String  dbPath = "mem:test;sql.enforce_strict_size=true;sql.restrict_exec=true;hsqldb.tx=mvcc";
+    String  serverProps;
+    String  url;
+    String  user     = "sa";
+    String  password = "";
+    Server server;
+    boolean isNetwork = true;
+    boolean isHTTP    = false;    // Set false to test HSQL protocol, true to test HTTP,
+    boolean isServlet = false;
 
-        this.dbSchema=dbSchema;
 
-        if (db_path == null) {
-            Registry.windowFabric.infoWindow("В локальных свойствах не задан путь БД");
-        }else {
-                init();
-                dbSchema.create();
+
+    protected void setUp() throws Exception {
+
+        if (isNetwork) {
+
+            //  change the url to reflect your preferred db location and name
+            if (url == null) {
+                if (isServlet) {
+                    url = "jdbc:hsqldb:http://localhost:8080/HSQLwebApp/test";
+                } else if (isHTTP) {
+                    url = "jdbc:hsqldb:http://localhost:8085/test";
+                } else {
+                    url = "jdbc:hsqldb:hsql://localhost/test";
+                }
             }
-    }
 
-    private void init() {
-        HsqlProperties props = new HsqlProperties();
+            if (!isServlet) {
+                server = isHTTP ? new WebServer()
+                        : new Server();
 
-        props.setProperty("server.database.0", "file:" + db_path +db_folder+"/"+ db_name);
-        props.setProperty("server.dbname.0", db_name);
+                if (isHTTP) {
+                    server.setPort(8085);
+                }
 
-
-        sonicServer = new org.hsqldb.Server();
-
-        try {
-            sonicServer.setProperties(props);
-        } catch (Exception e) {
-
-            Registry.windowFabric.infoWindow("sonicServer.setProperties(props)   не сработал!!\n\n".toUpperCase()+ e.getMessage() );
-            System.err.println(e.getMessage());
+                server.setDatabaseName(0, "test");
+                server.setDatabasePath(0, dbPath);
+                server.setLogWriter(null);
+                server.setErrWriter(null);
+                server.start();
+            }
+        } else {
+            if (url == null) {
+                url = "jdbc:hsqldb:" + dbPath;
+            }
         }
 
         try {
-               sonicServer.start();
+            Class.forName("org.hsqldb.jdbc.JDBCDriver");
         } catch (Exception e) {
-            Registry.windowFabric.infoWindow("sonicServer.start()   не сработал!!\n\n".toUpperCase()+ e.getMessage() );
-            System.err.println(e.getMessage());
+            e.printStackTrace();
+            System.out.println(this + ".setUp() error: " + e.getMessage());
         }
-
-//           sonicServer.shutdown();
-
-        createConnection();
     }
 
-    private void createConnection() {
+    protected void tearDown() {
+
+        if (isNetwork && !isServlet) {
+            server.shutdownWithCatalogs(Database.CLOSEMODE_IMMEDIATELY);
+
+            server = null;
+        }
+    }
+
+    protected Connection newConnection() throws SQLException {
+        return DriverManager.getConnection(url, user, password);
+    }
+
+    public static void runWithResult(Class testCaseClass, String testName) {
+
         try {
+            Constructor ctor = testCaseClass.getConstructor(new Class[]{
+                    String.class });
+            TestBase theTest = (TestBase) ctor.newInstance(new Object[]{
+                    testName });
 
-            Class.forName("org.hsqldb.jdbc.JDBCDriver" );
-            Db.connection= DriverManager.getConnection(
-//                    "jdbc:hsqldb:hsql://localhost:9001/", "SA", "");
-                    "jdbc:hsqldb:hsql://localhost/"+db_name, "SA", "");
-            statement=this.connection.createStatement();
-            statement.setQueryTimeout(30);
+            theTest.runWithResult();
+        } catch (Exception ex) {
+            System.err.println("couldn't execute test:");
+            ex.printStackTrace(System.err);
+        }
+    }
 
-        } catch (Exception e) {
-            Registry.windowFabric.infoWindow("Не получилось подключиться к базе данных!!\n\n".toUpperCase()+ e.getMessage() );
-            System.err.println(e.getMessage());
+    public void runWithResult() {
 
+        TestResult result   = run();
+        String     testName = this.getClass().getName();
+
+        if (testName.startsWith("org.hsqldb.test.")) {
+            testName = testName.substring(16);
+        }
+
+        testName += "." + getName();
+
+        int failureCount = result.failureCount();
+
+        System.out.println(testName + " failure count: " + failureCount);
+
+        java.util.Enumeration failures = result.failures();
+
+        while (failures.hasMoreElements()) {
+            System.err.println(failures.nextElement());
         }
     }
 
