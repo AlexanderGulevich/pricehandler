@@ -1,17 +1,16 @@
 package basisFx;
 
-import basisFx.appCore.elements.TableWrapper;
 import basisFx.appCore.menu.MenuFabric;
 import basisFx.appCore.settings.Settings;
 import basisFx.appCore.settings.StylesPathes;
 import basisFx.appCore.utils.*;
-import basisFx.appCore.windows.ButtonsForStageThreeEntity;
 import basisFx.appCore.windows.WindowAbstraction;
 import basisFx.appCore.windows.WindowBuilder;
-import basisFx.appCore.guiStructura.LeftAndTopMenuGUI;
 import basisFx.appCore.windows.WindowFabric;
 import basisFx.dataSource.DbFactory;
 import javafx.stage.Stage;
+
+import java.sql.Connection;
 //import org.scenicview.ScenicView;
 
 
@@ -30,9 +29,9 @@ public class App{
 //        PropertiesUtils.setProperty("db_name","komdb");
 
         PropertiesUtils.run();
-        PropertiesUtils.setProperty("db_name","price_db_OMTS");
-        PropertiesUtils.setProperty("db_folder","OMTS");
-        DbFactory.createDbServer(new DbSchemaPrice());
+        PropertiesUtils.setProperty("db_name","pricedb");
+        PropertiesUtils.setProperty("db_folder","omts");
+        DbFactory.createDbServerHsql(new DbSchemaPrice());
 
         Registry.windowFabric.mainWindow(primaryStage,
                 WindowBuilder.newBuilder()
@@ -42,7 +41,7 @@ public class App{
                         .setWidth(1250d)
                         .setHeight(Settings.HEIGHT)
                         .setPanelCreator(null)
-                        .setTitle(Settings.TITLE)
+                        .setTitle("ОБРАБОТЧИК ПРАЙСА")
                         .setMessage(null)
                         .build()
                 );

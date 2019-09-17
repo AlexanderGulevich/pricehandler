@@ -18,7 +18,7 @@ public class DbFactory {
         return new DbEmbeded();
     
     }
-    public static DbServetHsql createDbServer(DbSchema dbSchema ) {
+    public static DbServetHsql createDbServerHsql(DbSchema dbSchema ) {
     
         return new DbServetHsql(dbSchema );
     

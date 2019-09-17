@@ -2,6 +2,7 @@ package basisFx.dataSource;
 
 import basisFx.DbSchemaPrice;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 
@@ -11,6 +12,10 @@ import org.hsqldb.Server;
 import org.hsqldb.persist.HsqlProperties;
 
 public class DbServerHTTP extends Db{
+    @Override
+    public Connection newConnection() {
+        return null;
+    }
 //
 //
 //    String  dbPath = "mem:test;sql.enforce_strict_size=true;sql.restrict_exec=true;hsqldb.tx=mvcc";

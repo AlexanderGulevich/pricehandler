@@ -23,6 +23,7 @@ public class WindowImplInfo extends WindowImpl{
         ((WindowServiceInfo) windowService).setMessage(builder.message);
         setWindowAbstraction(windowAbstraction);
         windowAbstraction.stage.setAlwaysOnTop(true);
+        windowAbstraction.stage.setTitle(getTitleName());
     }
 
     @Override
