@@ -10,10 +10,14 @@ import javafx.stage.Stage;
 
 public class HideWindow extends AppEvent{
     protected Button  but;
+    private Stage stage;
+
     @Override
     public void setEventToElement(AppNode node) {
         this.nodeWrapper =node;
         this.but=(Button) node.getElement();
+
+        stage=node.getStage();
 
 
         but.setOnMouseClicked( (event) -> {
@@ -31,6 +35,7 @@ public class HideWindow extends AppEvent{
         this.but=(Button) node;
 
 
+
         but.setOnMouseClicked( (event) -> {
                     run();
 
@@ -41,14 +46,19 @@ public class HideWindow extends AppEvent{
 
     @Override
     public void setEventToElement(Node node, Stage stage) {
-
+        this.stage = stage;
+        this.but=(Button) node;
+        but.setOnMouseClicked((event) -> {
+                    run();
+                }
+        ) ;
     }
 
     @Override
     public void run() {
          try {
                 Thread.sleep(200);
-                nodeWrapper.getStage().setIconified(true);
+                stage.setIconified(true);
             } catch (InterruptedException ex) {
                 Logger.getLogger(CloseMainWindow.class.getName()).log(Level.SEVERE, null, ex);
             }

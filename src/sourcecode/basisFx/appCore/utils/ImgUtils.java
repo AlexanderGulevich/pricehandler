@@ -112,7 +112,12 @@ public class ImgUtils {
     }
     public static ByteArrayOutputStream toOutputStream(BufferedImage bufferedImage) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage,"png", os);
+        try {
+            ImageIO.write(bufferedImage,"png", os);
+        } catch (IOException e) {
+            return null;
+//            e.printStackTrace();
+        }
         return  os;
     }
 

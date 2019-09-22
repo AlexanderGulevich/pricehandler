@@ -6,6 +6,7 @@
 package basisFx.dataSource;
 
 import org.hsqldb.Server;
+import org.hsqldb.server.WebServer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,6 +19,7 @@ public abstract class Db {
     public static Connection connection = null;
 
     public static Server sonicServer = null;
+    public static WebServer webServer  = null;
 
 
     public Connection getConnection() {

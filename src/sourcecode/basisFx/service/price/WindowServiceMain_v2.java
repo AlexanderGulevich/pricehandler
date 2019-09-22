@@ -1,6 +1,8 @@
 package basisFx.service.price;
 
 import basisFx.appCore.events.CloseMainWindow;
+import basisFx.appCore.events.HideWindow;
+import basisFx.appCore.events.MaximazingSwither;
 import basisFx.appCore.events.StageDragging;
 import basisFx.appCore.utils.Registry;
 import basisFx.service.WindowService;
@@ -21,6 +23,8 @@ public class WindowServiceMain_v2 extends WindowService {
     @FXML private Label commonMenuLabel;
     @FXML private VBox vButHolder;
     @FXML private JFXButton cls_but;
+    @FXML private JFXButton wide_but;
+    @FXML private JFXButton hide_but;
 
     public WindowServiceMain_v2() {
         Registry.crossWindowMediators.put("Main_v2",this);
@@ -38,6 +42,8 @@ public class WindowServiceMain_v2 extends WindowService {
 
         new StageDragging().setEventToElement(titleAnchor);
         new CloseMainWindow().setEventToElement(cls_but,Registry.mainWindow.getStage());
+        new HideWindow().setEventToElement(hide_but,Registry.mainWindow.getStage());
+        new MaximazingSwither().setEventToElement(wide_but,Registry.mainWindow.getStage());
 //        companyNameText.setFont(FontLogic.loadFont(FontsStore.ROBOTO_BOLD,35));
 
 

@@ -344,14 +344,14 @@ public class WriterForPrice extends Writer {
         String barcode = filds.getBarcode();
         if (barcode != null) {
 
-            if (imgExistatnt && filds.getImg() != null && filds.getImg().getImgBig()!=null&& filds.getImg().getImgSmall()!=null) {
+            if (imgExistatnt && filds.getImg() != null && filds.getImg().getImgSmall()!=null) {
                 cellHandler.setCell(row.createCell(firstColIndex + 1))
                         .setCellValue("  " + filds.getBarcode())
                         .setCellStyle(ORANGE_FILLED_CELL_9_Brown_TEXT);
                 try {
                     if (imgExistatnt) {
                         try {
-                                CommentUtils.setComment(workbook, spreadsheet, cellHandler.getCell(), filds,bigImgSize);
+                                CommentUtils.setComment(workbook, spreadsheet, cellHandler.getCell(), filds);
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }

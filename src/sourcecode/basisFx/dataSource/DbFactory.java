@@ -23,6 +23,11 @@ public class DbFactory {
         return new DbServetHsql(dbSchema );
     
     }
+    public static DbServerHTTP createDbServerWeb(DbSchema dbSchema ) {
+
+        return new DbServerHTTP(dbSchema );
+
+    }
     
   
     

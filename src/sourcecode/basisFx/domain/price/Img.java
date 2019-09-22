@@ -29,7 +29,7 @@ public class Img extends ActiveRecord {
 
     private SimpleObjectProperty<String> barcode =new SimpleObjectProperty<>(this, "barcode", null);
 
-    private SimpleObjectProperty<InputStream> imgBig =new SimpleObjectProperty<>(this, "imgBig", null);
+//    private SimpleObjectProperty<InputStream> imgBig =new SimpleObjectProperty<>(this, "imgBig", null);
     private SimpleObjectProperty<InputStream> imgSmall =new SimpleObjectProperty<>(this, "imgSmall", null);
 
     public String getBarcode() {
@@ -49,17 +49,17 @@ public class Img extends ActiveRecord {
         return null;
     }
 
-    public InputStream getImgBig() {
-        return imgBig.get();
-    }
-
-    public SimpleObjectProperty<InputStream> imgBigProperty() {
-        return imgBig;
-    }
-
-    public void setImgBig(InputStream imgBig) {
-        this.imgBig.set(imgBig);
-    }
+//    public InputStream getImgBig() {
+//        return imgBig.get();
+//    }
+//
+//    public SimpleObjectProperty<InputStream> imgBigProperty() {
+//        return imgBig;
+//    }
+//
+//    public void setImgBig(InputStream imgBig) {
+//        this.imgBig.set(imgBig);
+//    }
 
     public InputStream getImgSmall() {
         return imgSmall.get();
@@ -104,14 +104,14 @@ public class Img extends ActiveRecord {
             String expression = "INSERT INTO " + this.entityName
                     + "("
                     + " barcode,  "
-                    + " imgBig,   "
+//                    + " imgBig,   "
                     + " imgSmall   "
-                    + ") VALUES(?,?,?)";
+                    + ") VALUES(?,?)";
 
             PreparedStatement pstmt = Db.connection.prepareStatement(expression);
             pstmt.setString(1, getBarcode());
-            pstmt.setBlob(2, getImgBig());
-            pstmt.setBlob(3, getImgSmall());
+            pstmt.setBlob(2, getImgSmall());
+
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -125,16 +125,16 @@ public class Img extends ActiveRecord {
     public void update() {
         String expression = "UPDATE " + this.entityName + " SET  " +
                 " barcode = ?," +
-                " imgBig = ?," +
+//                " imgBig = ?," +
                 " imgSmall = ?" +
                 " WHERE barcode= ?";
         PreparedStatement pstmt = null;
         try {
             pstmt = Db.connection.prepareStatement(expression);
             pstmt.setString(1, getBarcode());
-            pstmt.setBlob(2, getImgBig());
-            pstmt.setBlob(3, getImgSmall());
-            pstmt.setString(4, getBarcode());
+//            pstmt.setBlob(2, getImgBig());
+            pstmt.setBlob(2, getImgSmall());
+            pstmt.setString(3, getBarcode());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -160,15 +160,15 @@ public class Img extends ActiveRecord {
 
                 try {
 
-                    Blob image_blob_big=rs.getBlob("imgBig");
-                    int blobLength_big = (int) image_blob_big.length();
-                    byte[] blobAsBytes_big = image_blob_big.getBytes(1, blobLength_big);
-                    InputStream in_big=new ByteArrayInputStream( blobAsBytes_big );
-                    BufferedImage bufferedImageBig = ImageIO.read(in_big);
-                    if (bufferedImageBig != null) {
-
-                        pojo.setImgBig(ImgUtils.toInputStream(bufferedImageBig));
-                    }
+//                    Blob image_blob_big=rs.getBlob("imgBig");
+//                    int blobLength_big = (int) image_blob_big.length();
+//                    byte[] blobAsBytes_big = image_blob_big.getBytes(1, blobLength_big);
+//                    InputStream in_big=new ByteArrayInputStream( blobAsBytes_big );
+//                    BufferedImage bufferedImageBig = ImageIO.read(in_big);
+//                    if (bufferedImageBig != null) {
+//
+//                        pojo.setImgBig(ImgUtils.toInputStream(bufferedImageBig));
+//                    }
 
                     Blob image_blob_small=rs.getBlob("imgSmall");
                     int blobLength_small = (int) image_blob_small.length();
@@ -197,6 +197,40 @@ public class Img extends ActiveRecord {
         }else {
             return null;
         }
+
+
+
+    }
+
+
+    @Override
+    public void delete() {
+
+        try {
+            String expression="delete from " +entityName+"  WHERE barcode= ? ";
+            PreparedStatement pstmt =  Db.connection.prepareStatement(expression);
+            pstmt.setString(1, getBarcode());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        try {
+            String expression2 = "UPDATE " + "PriceItem"+ " SET  " +
+                    " IMGID = ?" +
+                    " WHERE barcode= ?";
+            PreparedStatement pstmt2 = null;
+            pstmt2 = Db.connection.prepareStatement(expression2);
+            pstmt2.setNull(1, Types.INTEGER);
+            pstmt2.setString(2, getBarcode());
+
+            pstmt2.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
 
 
 

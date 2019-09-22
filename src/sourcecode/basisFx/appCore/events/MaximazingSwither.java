@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -14,12 +15,16 @@ import javafx.stage.Stage;
 public class MaximazingSwither extends AppEvent{
     protected Node  node;
     protected boolean  max=false;
+    Stage stage;
+    private Button but;
 
 
     @Override
     public void setEventToElement(AppNode appNode) {
         this.nodeWrapper =appNode;
         this.node= appNode.getElement();
+
+          stage = nodeWrapper.getStage();
 
         node.setOnMouseClicked( (event) -> {
 
@@ -44,7 +49,12 @@ public class MaximazingSwither extends AppEvent{
 
     @Override
     public void setEventToElement(Node node, Stage stage) {
-
+        this.stage = stage;
+        this.but=(Button) node;
+        but.setOnMouseClicked((event) -> {
+                    run();
+                }
+        ) ;
     }
 
     @Override
@@ -54,7 +64,7 @@ public class MaximazingSwither extends AppEvent{
             System.err.println("MaximazingSwither.run");
             Thread.sleep(100);
 
-            Stage stage = nodeWrapper.getStage();
+
             AnchorPane root=(AnchorPane) stage.getScene().getRoot();
 
 //            if (stage.isMaximized()) {
@@ -65,7 +75,7 @@ public class MaximazingSwither extends AppEvent{
 
                   root.setPadding(new Insets(3d, 3d, 3d, 3d));
 
-                    nodeWrapper.getStage().setMaximized(false);
+                   stage.setMaximized(false);
                     stage.setWidth(Settings.WIDTH);
                     stage.setHeight(Settings.HEIGHT);
 

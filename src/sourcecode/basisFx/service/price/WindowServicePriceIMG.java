@@ -31,6 +31,7 @@ public  class WindowServicePriceIMG extends WindowService {
     @FXML private Label title;
     @FXML private Label barcodeLabel;
     @FXML private JFXButton addPic;
+    @FXML private JFXButton del;
     @FXML private ImageView imgview;
 
     FileChooser fileChooser;
@@ -51,6 +52,18 @@ public  class WindowServicePriceIMG extends WindowService {
         outerTableDataHandler();
         viewStoredImg();
         fileChooserHandler();
+
+        del.setOnAction(event -> {
+            if (clickedDomain != null && clickedDomain.getImg() != null ) {
+                Img img = clickedDomain.getImg();
+                img.delete();
+                clickedDomain.setImg(null);
+                imgview.setImage(null);
+                ObservableList<ActiveRecord> all = PriceItem.getINSTANCE().getAll();
+                outer_table_wrapper.setItems(all);
+            }
+
+        });
     }
     @Override
     public void inform(Object node) {
@@ -63,22 +76,22 @@ public  class WindowServicePriceIMG extends WindowService {
             File filesmall = new File(absolutePath);
             File filetoview = new File(absolutePath);
 
-            ByteArrayInputStream byteArrayInputStream480 = ImgUtils.resize(filebig, 480);
+//            ByteArrayInputStream byteArrayInputStream480 = ImgUtils.resize(filebig, 480);
             ByteArrayInputStream byteArrayInputStream160 = ImgUtils.resize(filesmall, 160);
-            ByteArrayInputStream byteArrayInputStreamfiletoview = ImgUtils.resize(filetoview, 480);
+            ByteArrayInputStream byteArrayInputStreamfiletoview = ImgUtils.resize(filetoview, 160);
 
             Img img=null;
 
             if (clickedDomain != null && clickedDomain.getImg() != null ) {
                  img =clickedDomain.getImg() ;
                     img.setBarcode(barcodeLabel.getText());
-                    img.setImgBig(byteArrayInputStream480);
+//                    img.setImgBig(byteArrayInputStream480);
                     img.setImgSmall(byteArrayInputStream160);
                     img.update();
             }else {
                 img = new Img();
                 img.setBarcode(barcodeLabel.getText());
-                img.setImgBig(byteArrayInputStream480);
+//                img.setImgBig(byteArrayInputStream480);
                 img.setImgSmall(byteArrayInputStream160);
                 img.insert();
             }
@@ -138,8 +151,8 @@ public  class WindowServicePriceIMG extends WindowService {
     private void viewStoredImg() {
         Img img = Img.getINSTANCE().find(clickedDomain);
         if (img != null) {
-            InputStream imgBig = img.getImgBig();
-            Image image=new Image(imgBig);
+            InputStream imgSmall = img.getImgSmall();
+            Image image=new Image(imgSmall);
             imgview.setImage(image);
             imgview.setFitHeight(333);
             boolean image1Error = image.isError();

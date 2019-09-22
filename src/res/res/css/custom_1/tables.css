@@ -27,13 +27,14 @@
  .TABLE_BFx .text-field-table-cell,
  .TABLE_BFx .table-column{
 	   -fx-padding:  0, 10, 0, 0;
+	    -fx-pref-height:27;
  }
 .TABLE_BFx  .table-column {  -fx-pref-height:25;}
 /* #.TABLE_BFx .nested-column-header, */
 .TABLE_BFx .column-header{/*ЗАГОЛОВОК КОЛОНКИ*/
     /* -fx-background-color:#8fbcc4; */
     -fx-background-color:transparent;
-    -fx-pref-height:45;
+    -fx-pref-height:47;
     -fx-border-radius:0;
     -fx-border-width: 0 1 1 0;
     -fx-border-style: solid;
@@ -263,6 +264,32 @@
 
 
 
+      .wrappedHeaderColumn_font_size_17 .column-header{
+        /*ЗАГОЛОВОК КОЛОНКИ с классом wrappedHeaderColumn который позволяет деляать перенос строки с помощью \n в тексте строки*/
+           -fx-background-color:#f7f7c2;
+           -fx-background-color:transparent;
+           -fx-pref-height:45;
+           -fx-border-radius:0;
+           -fx-border-width: 0 1 1 0;
+           -fx-border-style: solid;;
+           -fx-border-color:#DFDFDF;
+           -fx-background-radius: 0;
+           -fx-background-insets: 0;
+           -fx-padding: 0 0 10 0;
+       }
+
+      .wrappedHeaderColumn_font_size_17 .nested-column-header .label {
+          -fx-text-fill:#2f4a6f;
+          /* -fx-text-fill:#8f9bac; */
+          -fx-font-family: "Roboto Light";
+          -fx-font-size: 17;
+          -fx-background-insets: 0;
+          -fx-padding: 0 0 0 0;
+          -fx-border-insets:0 0 0 0;
+      }
+
+
+
       .wrappedHeaderColumn_font_size_16 .column-header{
         /*ЗАГОЛОВОК КОЛОНКИ с классом wrappedHeaderColumn который позволяет деляать перенос строки с помощью \n в тексте строки*/
            -fx-background-color:#f7f7c2;
@@ -393,3 +420,16 @@
                       -fx-font-family: "Roboto Light";
                       -fx-font-size: 14;
                   }
+
+                  .table_font_size_15 .table-cell{
+                            -fx-text-fill:#074f5d;
+                            -fx-font-family: "Roboto Light";
+                            -fx-font-size: 15;
+                        }
+
+
+                        .table_font_size_16 .table-cell{
+                                  -fx-text-fill:#074f5d;
+                                  -fx-font-family: "Roboto Light";
+                                  -fx-font-size: 16;
+                              }

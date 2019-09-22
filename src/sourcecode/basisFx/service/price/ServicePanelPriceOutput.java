@@ -80,11 +80,15 @@ public class ServicePanelPriceOutput extends ServicePanels {
         comboboxAdapter = new ComboboxAdapter(tamplateCombobox, this, OutputTemplate.getINSTANCE());
         currentWindow=Registry.mainWindow;
 
+        addImage.setSelected(true);
+        swichImgSize.setVisible(false);
+
         directoryChosserEvent = new DirectoryChosserEvent();
         directoryChosserEvent.setEventToElement(output);
         directoryChosserEvent.setMediator(this);
         directoryChosserEvent.setCallBackTyped(() -> {
             Price price = (Price) Registry.dataExchanger.get("price");
+            price.setAllRecords(PriceItem.getINSTANCE().getAllFullData());
             if (price == null) {
                 Registry.windowFabric.infoWindow("Для того, чтобы сохранить обработанный прайс, его нужно сначала загрузить из остатков!");
                 return false;
@@ -116,7 +120,11 @@ public class ServicePanelPriceOutput extends ServicePanels {
                 standatrCategory.setSelected(false);
             }
 
+
         });
+
+
+        standatrCategory.setSelected(true);
     }
 
     private void saveTemplateAction() {
@@ -171,7 +179,7 @@ public class ServicePanelPriceOutput extends ServicePanels {
 
     private void switchImgInit() {
         swichImgSize.setText("Большие картинки");
-        swichImgSize.setSelected(true);
+        swichImgSize.setSelected(false);
         swichImgSize.setOnAction(event -> {
         });
     }

@@ -9,6 +9,7 @@ import basisFx.appCore.utils.PropertiesUtils;
 import basisFx.appCore.utils.Registry;
 import org.hsqldb.Server;
 import org.hsqldb.persist.HsqlProperties;
+import org.hsqldb.server.WebServer;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -43,9 +44,11 @@ public class DbServetHsql extends Db{
         props.setProperty("server.trace ", true);
         props.setProperty("hsqldb.tx", " MVCC");
         props.setProperty("server.port", "9003");
+        props.setProperty("hsqldb.lock_file", false);
 
         sonicServer = new Server();
-
+//        WebServer webServer = new WebServer();
+//
         try {
             sonicServer.setProperties(props);
         } catch (Exception e) {
@@ -94,7 +97,7 @@ public class DbServetHsql extends Db{
 
 
 
-            Db.connection= DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:9003/"+db_name  +";hsqldb.tx=mvcc" , "SA", "");
+            Db.connection= DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:9003/"+db_name  +";hsqldb.lock_file=false;hsqldb.tx=mvcc" , "SA", "");
             statement=this.connection.createStatement();
             statement.setQueryTimeout(30);
 
@@ -127,7 +130,7 @@ public class DbServetHsql extends Db{
 
 
 
-             connection2 = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:9003/" + db_name+";hsqldb.tx=mvcc", "SA", "");
+             connection2 = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:9003/" + db_name+";hsqldb.lock_file=false;hsqldb.tx=mvcc", "SA", "");
             Statement statement2 = connection2.createStatement();
             statement2.setQueryTimeout(30);
 

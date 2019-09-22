@@ -1,9 +1,11 @@
 package basisFx;
 
+import basisFx.appCore.guiStructura.LeftAndTopMenuGUI;
 import basisFx.appCore.menu.MenuFabric;
 import basisFx.appCore.settings.Settings;
 import basisFx.appCore.settings.StylesPathes;
 import basisFx.appCore.utils.*;
+import basisFx.appCore.windows.ButtonsForStageThreeEntity;
 import basisFx.appCore.windows.WindowAbstraction;
 import basisFx.appCore.windows.WindowBuilder;
 import basisFx.appCore.windows.WindowFabric;
@@ -32,13 +34,14 @@ public class App{
         PropertiesUtils.setProperty("db_name","pricedb");
         PropertiesUtils.setProperty("db_folder","omts");
         DbFactory.createDbServerHsql(new DbSchemaPrice());
+//        DbFactory.createDbServerWeb(new DbSchemaPrice());
 
         Registry.windowFabric.mainWindow(primaryStage,
                 WindowBuilder.newBuilder()
 //                        .setButtonsForStage(new ButtonsForStageThreeEntity(LeftAndTopMenuGUI.Structura.titleAnchor.name()))
                         .setFxmlFileName("Main_v2")
                         .setParentAnchorNameForFXML(WindowAbstraction.DefaultPanelsNames.topVisibleAnchor.name())
-                        .setWidth(1250d)
+                        .setWidth(1350d)
                         .setHeight(Settings.HEIGHT)
                         .setPanelCreator(null)
                         .setTitle("ОБРАБОТЧИК ПРАЙСА")
