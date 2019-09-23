@@ -77,8 +77,8 @@ public  class WindowServicePriceIMG extends WindowService {
             File filetoview = new File(absolutePath);
 
 //            ByteArrayInputStream byteArrayInputStream480 = ImgUtils.resize(filebig, 480);
-            ByteArrayInputStream byteArrayInputStream160 = ImgUtils.resize(filesmall, 160);
-            ByteArrayInputStream byteArrayInputStreamfiletoview = ImgUtils.resize(filetoview, 160);
+            ByteArrayInputStream byteArrayInputStream160 = ImgUtils.resize(filesmall, 130);
+            ByteArrayInputStream byteArrayInputStreamfiletoview = ImgUtils.resize(filetoview, 130);
 
             Img img=null;
 
@@ -107,6 +107,7 @@ public  class WindowServicePriceIMG extends WindowService {
             }else {
                 imgview.setImage(image1);
                 imgview.setFitHeight(333);
+                imgview.setFitWidth(160);
                 clickedDomain.setImg(img);
                 clickedDomain.insert();
                 //todo

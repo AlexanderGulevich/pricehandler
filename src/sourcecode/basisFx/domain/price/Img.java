@@ -203,6 +203,56 @@ public class Img extends ActiveRecord {
     }
 
 
+    public Img find(String barcode)  {
+
+        Img pojo=new Img() ;
+        String expression="SELECT * FROM " +entityName+" WHERE barcode=?";
+        boolean hasInner=false;
+        try {
+            PreparedStatement pstmt = Db.connection.prepareStatement(expression);
+            pstmt.setString(1, barcode);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()){
+                hasInner=true;
+                pojo.setId(rs.getInt("id"));
+                pojo.setBarcode(barcode);
+
+                try {
+
+                    Blob image_blob_small=rs.getBlob("imgSmall");
+                    int blobLength_small = (int) image_blob_small.length();
+                    byte[] blobAsBytes_small = image_blob_small.getBytes(1, blobLength_small);
+                    InputStream in_small=new ByteArrayInputStream( blobAsBytes_small );
+                    BufferedImage bufferedImageSmall = ImageIO.read(in_small);
+                    if (bufferedImageSmall != null) {
+
+                        pojo.setImgSmall(ImgUtils.toInputStream(bufferedImageSmall));
+                    }
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Registry.windowFabric.infoWindow("Ошибка в загрузке картинки из БД\n\n"+e.getMessage());
+        }
+
+        if (hasInner){
+            return pojo;
+        }else {
+            return null;
+        }
+
+
+
+    }
+
+
     @Override
     public void delete() {
 

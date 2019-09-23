@@ -69,28 +69,6 @@ public class MainMenuSketch implements MenuSketch {
 
 
 
-        menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
-                .panelCreator(  () -> new DynamicContentPanel() {
-                    @Override
-                    protected void customDynamicElementsInit() {
-                        Panel.builder()
-                                .commonLabelName("Задание псевдонимов и категорий")
-                                .fxmlFileName("priceWritter")
-                                .parent(dynamicContentAnchorHolder)
-                                .build().configure();
-                    }
-                })
-                .description("Управление категориями вывода, картинками \n")
-                .fontsStore(FAWESOME5SOLID)
-                .fxmlFileName("vbut.fxml")
-                .fontSymbol("\uF093")
-                .isActive(false)
-                .fontSize(iconSize)
-                .build()
-        );
-
-
-
 
 
 
@@ -112,6 +90,53 @@ public class MainMenuSketch implements MenuSketch {
                     .fontSize(iconSize)
                     .build()
         ) ;
+
+
+
+
+
+        menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
+                .panelCreator(  () -> new DynamicContentPanel() {
+                    @Override
+                    protected void customDynamicElementsInit() {
+                        Panel.builder()
+                                .commonLabelName("Множественная загрузка картинок ")
+                                .fxmlFileName("priceImgLoader")
+                                .parent(dynamicContentAnchorHolder)
+                                .build().configure();
+                    }
+                })
+                    .description("Картинки:загрузка")
+                    .fontsStore(FAWESOME5SOLID)
+                    .fxmlFileName("vbut.fxml")
+                    .fontSymbol("\uF083")
+                    .fontSize(iconSize)
+                    .build()
+        ) ;
+
+
+
+
+
+        menuDirector.setComposite(LeftAndTopBarItemComposite.builder()
+                .panelCreator(  () -> new DynamicContentPanel() {
+                    @Override
+                    protected void customDynamicElementsInit() {
+                        Panel.builder()
+                                .commonLabelName("Задание псевдонимов и категорий")
+                                .fxmlFileName("priceWritter")
+                                .parent(dynamicContentAnchorHolder)
+                                .build().configure();
+                    }
+                })
+                .description("Управление категориями вывода, картинками, выгрузка \n")
+                .fontsStore(FAWESOME5SOLID)
+                .fxmlFileName("vbut.fxml")
+                .fontSymbol("\uF093")
+                .isActive(false)
+                .fontSize(iconSize)
+                .build()
+        );
 
 
 
