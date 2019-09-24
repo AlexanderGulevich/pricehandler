@@ -34,6 +34,8 @@ public  class WindowServicePriceIMG extends WindowService {
     @FXML private JFXButton del;
     @FXML private ImageView imgview;
 
+    private int widthImg=160;
+
     FileChooser fileChooser;
     TableWrapper outer_table_wrapper;
     StringHandler stringHandler=new  StringHandler();
@@ -52,6 +54,11 @@ public  class WindowServicePriceIMG extends WindowService {
         outerTableDataHandler();
         viewStoredImg();
         fileChooserHandler();
+
+
+
+        imgview.setFitHeight(333);
+        imgview.setFitWidth(160);
 
         del.setOnAction(event -> {
             if (clickedDomain != null && clickedDomain.getImg() != null ) {
@@ -77,8 +84,8 @@ public  class WindowServicePriceIMG extends WindowService {
             File filetoview = new File(absolutePath);
 
 //            ByteArrayInputStream byteArrayInputStream480 = ImgUtils.resize(filebig, 480);
-            ByteArrayInputStream byteArrayInputStream160 = ImgUtils.resize(filesmall, 130);
-            ByteArrayInputStream byteArrayInputStreamfiletoview = ImgUtils.resize(filetoview, 130);
+            ByteArrayInputStream byteArrayInputStream160 = ImgUtils.resize(filesmall, widthImg);
+            ByteArrayInputStream byteArrayInputStreamfiletoview = ImgUtils.resize(filetoview, widthImg);
 
             Img img=null;
 
@@ -106,8 +113,6 @@ public  class WindowServicePriceIMG extends WindowService {
                 Registry.windowFabric.infoWindow("Некая ошибка при обработке изображения\n"+  image1.getException().getMessage());
             }else {
                 imgview.setImage(image1);
-                imgview.setFitHeight(333);
-                imgview.setFitWidth(160);
                 clickedDomain.setImg(img);
                 clickedDomain.insert();
                 //todo
@@ -155,7 +160,6 @@ public  class WindowServicePriceIMG extends WindowService {
             InputStream imgSmall = img.getImgSmall();
             Image image=new Image(imgSmall);
             imgview.setImage(image);
-            imgview.setFitHeight(333);
             boolean image1Error = image.isError();
             if (image1Error) {
                 Registry.windowFabric.infoWindow("Некая ошибка при обработке изображения из БД\n"+  image.toString());

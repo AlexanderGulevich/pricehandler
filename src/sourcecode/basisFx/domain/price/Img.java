@@ -115,6 +115,7 @@ public class Img extends ActiveRecord {
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
+            System.out.println("ERROR - "+getBarcode());
             e.printStackTrace();
         }
 

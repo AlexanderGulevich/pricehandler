@@ -71,6 +71,7 @@ public class ServicePanelLoadImg extends ServicePanels {
             List<File> files = Arrays.asList(fls);
 
             AtomicReference<Integer> numFiles= new AtomicReference<>(0);
+            AtomicReference<Integer> notLoadedFiles= new AtomicReference<>(0);
 
 
             files.stream().forEach(file -> {
@@ -80,19 +81,16 @@ public class ServicePanelLoadImg extends ServicePanels {
                     String ext = name.substring(i + 1);
                     String barcode = name.substring(0, i);
 
-                    if (ext.equals("png") ||
-                            (  ext.equals("PNG") ||
-                            ext.equals("jpg") ||
-                            ext.equals("JPG") ||
-                            ext.equals("jpeg") ||
-                            ext.equals("JPEG"))
+                    if (    ( ext.equals("png") || ext.equals("PNG") ||
+                            ext.equals("jpg") || ext.equals("JPG") ||
+                            ext.equals("jpeg") || ext.equals("JPEG")  )
                             && barcode.trim().length()==13
                             && checkIntNameParsing(barcode)
                     ) {
 
                         Img img1 = Img.getINSTANCE().find(barcode);
                         if (img1 == null) {
-                            ByteArrayInputStream byteArrayInputStream160 = ImgUtils.resize(file, 130);
+                            ByteArrayInputStream byteArrayInputStream160 = ImgUtils.resize(file, 160);
                             Img img = null;
                             img = new Img();
                             img.setBarcode(barcode);
@@ -100,10 +98,13 @@ public class ServicePanelLoadImg extends ServicePanels {
                             img.insert();
 
                             numFiles.set(numFiles.get() + 1);
+
                         }
+                        number.setText(numFiles.get().toString());
 
 
-
+                    }else {
+                        notLoadedFiles.set(notLoadedFiles.get() + 1);
                     }
 
 
@@ -111,7 +112,10 @@ public class ServicePanelLoadImg extends ServicePanels {
                 }
             });
 
-            number.setText(numFiles.get().toString());
+
+            System.out.println("notLoadedFiles-----"+notLoadedFiles.get());
+
+            number.setText(numFiles.get().toString()+"шт. Процесс завершен");
 
             Price price = (Price) Registry.dataExchanger.get("price");
             if (price != null) {
